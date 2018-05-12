@@ -21,7 +21,9 @@ FIXME
   * [well explained here](http://esp-idf.readthedocs.io/en/latest/api-guides/jtag-debugging/#jtag-debugging-setup-openocd)
   * [download esp32 openocd](http://esp-idf.readthedocs.io/en/latest/api-guides/jtag-debugging/setup-openocd-linux.html)
 
-2. FTDI Connection
+2. FTDI Connection as shown below
+
+
   | FT2232HL     |  ESP32     | Purpose    |
   | ------------ | ---------- | ---------- |
   |ADBUS0        | 13         | TCK        |
