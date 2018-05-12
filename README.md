@@ -15,6 +15,10 @@ just getting started, folks!
 | Green LED  | 22     |
 
 
+## Schematic
+
+Check [this](doc/T10_V1.2.pdf) out
+
 ## Boot Process
 
 FIXME
