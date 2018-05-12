@@ -36,7 +36,7 @@ FIXME
   * you can't use JTAG interface while using Micro-SD slot
   * we need a some special SDIO adapter to connect FT2232H and ESP32
 
-  And finally found a wonderful sdio adapter card.
+  And finally found a wonderful sdio adapter.
   ![SDIO adapter](captures/sdio_adapter.jpg "sdio adapter")
   Check it out at [Aliexpress](https://www.aliexpress.com/item/kebidu-Hot-sale-25CM-48CM-62CM-TF-to-micro-SD-card-Flex-Extension-cable-Extender-Adapter/32832944156.html?spm=2114.10010108.1000013.1.27bc4b3b74DRpO&scm=1007.13339.90158.0&scm_id=1007.13339.90158.0&scm-url=1007.13339.90158.0&pvid=2645295a-4392-4172-896b-e88ce2aafd8f&_t=pvid:2645295a-4392-4172-896b-e88ce2aafd8f,scm-url:1007.13339.90158.0)
 
