@@ -10,7 +10,7 @@ just getting started, folks!
 
 ## Pins
 
-| Purpose   | Pin #  |
+| Purpose   | Pin#   |
 | --------- | ------ ¦
 | Green LED | 22     |
 
