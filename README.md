@@ -12,7 +12,7 @@ just getting started, folks!
 
   | Purpose   | Pin #  |
   | --------- | ------ ¦
-  | Green LED | 22     |
+  | reen LED  | 22     |
 
 
 ## Boot Process
