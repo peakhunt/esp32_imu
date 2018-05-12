@@ -10,9 +10,9 @@ just getting started, folks!
 
 ## Pins
 
-| Purpose   | Pin#   |
-| --------- | ------ ¦
-| Green LED | 22     |
+  | Purpose   | Pin #  |
+  | --------- | ------ ¦
+  | Green LED | 22     |
 
 
 ## Boot Process
