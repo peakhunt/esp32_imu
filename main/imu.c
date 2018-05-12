@@ -5,8 +5,10 @@
 #include "sdkconfig.h"
 
 #include "blinky.h"
+#include "app_wifi.h"
 
 void app_main()
 {
+  app_wifi_init();
   blinky_init();
 }
