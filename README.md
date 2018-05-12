@@ -23,7 +23,7 @@ FIXME
 
 2. FTDI Connection
   | FT2232HL     |  ESP32     | Purpose    |
-  | ------------ |:----------:| ----------:|
+  | ------------ | ---------- | ---------- |
   |ADBUS0        | 13         | TCK        |
   |ADBUS1        | 12         | TDI        |
   |ADBUS2        | 15         | TDO        |
