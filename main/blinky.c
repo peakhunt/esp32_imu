@@ -2,10 +2,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
+#include "esp_log.h"
 #include "sdkconfig.h"
 
 #define BLINK_GPIO CONFIG_BLINK_GPIO
 #define BLINK_DELAY 100
+
+static const char* TAG = "blinky";
 
 void blink_task(void *pvParameter)
 {
@@ -28,5 +31,12 @@ void blink_task(void *pvParameter)
 void
 blinky_init(void)
 {
+  ESP_LOGI(TAG, "starting blinky");
+  //
+  // XXX
+  // with this task stack size. calling ESP_LOGI will overflow the stack.
+  // but at the same time, does the blinky task deserves a 1K task stack?
+  // I don't think so.
+  //
   xTaskCreate(blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
 }
