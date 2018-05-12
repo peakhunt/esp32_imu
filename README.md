@@ -26,10 +26,10 @@ Actually this is well explained [here](https://esp-idf.readthedocs.io/en/v2.0/ge
 
 To sum it up,
 1. ROM bootloader loads second-stage bootloader in SPI Flash to RAM from flash offset 0x1000
-   Second-stage bootloader source is available at components/bootloader directory of ESP-IDF.
-   Partition table is at 0x8000 of SPI flash.
-   It is interesting to note that second-stage bootloader initializes MMU!
-   Also it is interesting to note that SPI flash memory is memory mapped by MMU and can be read via normal memory read.
+   * Second-stage bootloader source is available at components/bootloader directory of ESP-IDF.
+   * Partition table is at 0x8000 of SPI flash.
+   * It is interesting to note that second-stage bootloader initializes MMU!
+   * Also it is interesting to note that SPI flash memory is memory mapped by MMU and can be read via normal memory read.
 
 2. Second-stage bootloader loads partition table and main application image
 
