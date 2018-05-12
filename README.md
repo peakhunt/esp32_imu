@@ -9,10 +9,9 @@
 just getting started, folks!
 
 ## Pins
-So far...
 
 | Purpose    | Pin #  |
-| ---------- | ------ ¦
+| ---------- | ------ |
 | Green LED  | 22     |
 
 
