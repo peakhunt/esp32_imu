@@ -36,9 +36,10 @@ To sum it up,
 3. main app executes
 
 Application Memory Layout. The chip itself is not that simple.
+ESP32 comes with 520 KiB SRAM. Most boards I know have 4 MB SPI flash.
 
 | Type        | Note                                                                 |
-¦ ----------- | -------------------------------------------------------------------- |
+| ----------- | -------------------------------------------------------------------- |
 | IRAM        | instruction RAM. a part of internal SRAM0. fast execution & for ISRs |
 | IROM        | instruction ROM. SPI flash.                                          |
 | RTC fasl    | for code that has to run after wake-up from deep sleep.              |
@@ -62,8 +63,6 @@ Application Memory Layout. The chip itself is not that simple.
   |ADBUS3        | 14         | TMS        |
   |GND           | GND        | GND        |
   |VIO           | 3V3        | 3V3        |
-
-  ESP32 comes with 520 KiB SRAM. Most boards I know have 4 MB SPI flash.
 
   Problem is pin 12/13/14/15 are used for SDIO, which means
   * you can't use JTAG interface while using Micro-SD slot
