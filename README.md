@@ -17,5 +17,22 @@ FIXME
 
 ## Debugger Setup
 
-1. build openocd
+1. get openocd
   * [well explained here](http://esp-idf.readthedocs.io/en/latest/api-guides/jtag-debugging/#jtag-debugging-setup-openocd)
+  * [download esp32 openocd](http://esp-idf.readthedocs.io/en/latest/api-guides/jtag-debugging/setup-openocd-linux.html)
+
+2. FTDI Connection
+  
+  FT2232HL       ESP32        Purpose
+  -----------------------------------
+  ADBUS0         13           TCK
+  ADBUS1         12           TDI
+  ADBUS2         15           TDO
+  ADBUS3         14           TMS
+  GND                         GND
+  VIO                         3V3
+
+
+  Problem is Pin 12/13/14/15 are used for SDIO, which means
+  * you can't use JTAG interface while using Micro-SD slot
+  * we need a some special SDIO adapter to connect FT2232H and ESP32
