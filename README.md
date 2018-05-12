@@ -9,7 +9,7 @@
 just getting started, folks!
 
 ## Pins
-
+So far...
 
 | Purpose    | Pin #  |
 | ---------- | ------ ¦
