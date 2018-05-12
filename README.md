@@ -21,7 +21,30 @@ Check [this](doc/T10_V1.2.pdf) out
 
 ## Boot Process
 
-FIXME
+To develop a firm understanding on what's going on behind the scenes, I always care about system startup process.
+Actually this is well explained [here](https://esp-idf.readthedocs.io/en/v2.0/general-notes.html)
+
+To sum it up,
+1. ROM bootloader loads second-stage bootloader in SPI Flash to RAM from flash offset 0x1000
+   Second-stage bootloader source is available at components/bootloader directory of ESP-IDF.
+   Partition table is at 0x8000 of SPI flash.
+   It is interesting to note that second-stage bootloader initializes MMU!
+   Also it is interesting to note that SPI flash memory is memory mapped by MMU and can be read via normal memory read.
+
+2. Second-stage bootloader loads partition table and main application image
+
+3. main app executes
+
+Application Memory Layout. The chip itself is not that simple.
+
+| Type        | Note                                                                 |
+¦ ----------- | -------------------------------------------------------------------- |
+| IRAM        | instruction RAM. a part of internal SRAM0. fast execution & for ISRs |
+| IROM        | instruction ROM. SPI flash.                                          |
+| RTC fasl    | for code that has to run after wake-up from deep sleep.              |
+| DRAM        | data ram. of course.                                                 |
+| DROM        | read only data in SPI flash.                                         |
+| RTC slow    | blah blah blah                                                       |
 
 ## Debugger Setup
 
@@ -39,6 +62,8 @@ FIXME
   |ADBUS3        | 14         | TMS        |
   |GND           | GND        | GND        |
   |VIO           | 3V3        | 3V3        |
+
+  ESP32 comes with 520 KiB SRAM. Most boards I know have 4 MB SPI flash.
 
   Problem is pin 12/13/14/15 are used for SDIO, which means
   * you can't use JTAG interface while using Micro-SD slot
