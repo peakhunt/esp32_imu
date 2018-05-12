@@ -1,0 +1,3 @@
+# ESP32 IMU
+
+9-DOF IMU using ESP32 and MPU9250
