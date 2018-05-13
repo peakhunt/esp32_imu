@@ -13,7 +13,7 @@ By the way, the code might seem a bit intimidating at first.
 But that is how I think networking code should be written. Everything should be an event
 using an simple event loop. Otherwise you wouldn't be able to handle the complications and the concurrency in the end. Just my opinion!
 
-[telnet cli](captures/cli.png "shell telnetl")
+![telnet cli](captures/cli.png "shell telnetl")
 
 ### as of May,12,2018
 just getting started, folks!
