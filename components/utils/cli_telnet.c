@@ -229,3 +229,25 @@ cli_telnet_intf_init(int port)
 
   cli_telnet_server_init(&_cli_ipv4_server, port, 5);
 }
+
+void
+cli_telnet_show_connections(cli_intf_t* intf)
+{
+  cli_connection_t* con;
+  struct sockaddr_in    from;
+  socklen_t             from_len;
+  char                  strbuf[128];
+
+
+  list_for_each_entry(con, &_cli_ipv4_server.conns, le)
+  {
+    memset(&from, 0, sizeof(from));
+    from_len = sizeof(from);
+
+    getpeername(con->stream.watcher.fd, (struct sockaddr*)&from, &from_len);
+
+    inet_ntoa_r(from.sin_addr, strbuf, 128);
+
+    cli_printf(intf, "%s:%d"CLI_EOL, strbuf, ntohs(from.sin_port));
+  }
+}

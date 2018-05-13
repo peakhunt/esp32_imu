@@ -8,6 +8,7 @@
 #include "cli.h"
 
 extern void cli_telnet_intf_init(int port);
+extern void cli_telnet_show_connections(cli_intf_t* intf);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -26,6 +27,7 @@ extern void cli_telnet_intf_init(int port);
 ////////////////////////////////////////////////////////////////////////////////
 static void cli_command_help(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_version(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_cli_connections(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -45,6 +47,11 @@ static cli_command_t    _core_commands[] =
     "version",
     "show version",
     cli_command_version,
+  },
+  {
+    "cli_conn",
+    "show current CLI connections",
+    cli_command_cli_connections,
   },
 };
 
@@ -84,6 +91,12 @@ cli_command_version(cli_intf_t* intf, int argc, const char** argv)
 {
   cli_printf(intf, CLI_EOL);
   cli_printf(intf, "%s"CLI_EOL, VERSION);
+}
+
+static void
+cli_command_cli_connections(cli_intf_t* intf, int argc, const char** argv)
+{
+  cli_telnet_show_connections(intf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
