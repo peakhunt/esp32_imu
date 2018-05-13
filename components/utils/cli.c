@@ -7,9 +7,6 @@
 
 #include "cli.h"
 
-#include "esp_system.h"
-#include "esp_spi_flash.h"
-
 extern void cli_telnet_intf_init(int port);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -29,8 +26,6 @@ extern void cli_telnet_intf_init(int port);
 ////////////////////////////////////////////////////////////////////////////////
 static void cli_command_help(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_version(cli_intf_t* intf, int argc, const char** argv);
-static void cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv);
-static void cli_command_systime(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -51,16 +46,6 @@ static cli_command_t    _core_commands[] =
     "show version",
     cli_command_version,
   },
-  {
-    "sysinfo",
-    "show system info",
-    cli_command_sysinfo,
-  },
-  {
-    "systime",
-    "show system uptime",
-    cli_command_systime,
-  }
 };
 
 static cli_command_t*   _user_commands;
@@ -99,34 +84,6 @@ cli_command_version(cli_intf_t* intf, int argc, const char** argv)
 {
   cli_printf(intf, CLI_EOL);
   cli_printf(intf, "%s"CLI_EOL, VERSION);
-}
-
-static void
-cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv)
-{
-  esp_chip_info_t chip_info;
-  esp_chip_info(&chip_info);
-
-  cli_printf(intf, CLI_EOL);
-  cli_printf(intf, "This is ESP32 chip with %d CPU cores, WiFi%s%s, ",
-      chip_info.cores,
-      (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-      (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-  cli_printf(intf, "silicon revision %d, ", chip_info.revision);
-  cli_printf(intf, "%dMB %s flash"CLI_EOL, spi_flash_get_chip_size() / (1024 * 1024),
-      (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-}
-
-static void
-cli_command_systime(cli_intf_t* intf, int argc, const char** argv)
-{
-  struct timeval tv;
-
-  gettimeofday(&tv, NULL);
-
-  cli_printf(intf, CLI_EOL);
-  cli_printf(intf, "uptime: %d"CLI_EOL, tv.tv_sec);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
