@@ -238,6 +238,9 @@ cli_handle_rx(cli_intf_t* intf, uint8_t* data, int len)
 void
 cli_intf_register(cli_intf_t* intf)
 {
+  INIT_LIST_HEAD(&intf->le);
+  intf->cmd_buffer_ndx = 0;
+
   list_add_tail(&intf->le, &_cli_intf_list);
 }
 
