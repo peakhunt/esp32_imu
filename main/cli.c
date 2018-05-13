@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "cli.h"
 
@@ -29,6 +30,7 @@ extern void cli_telnet_intf_init(int port);
 static void cli_command_help(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_version(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_systime(cli_intf_t* intf, int argc, const char** argv);
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -54,6 +56,11 @@ static cli_command_t    _core_commands[] =
     "show system info",
     cli_command_sysinfo,
   },
+  {
+    "systime",
+    "show system uptime",
+    cli_command_systime,
+  }
 };
 
 static cli_command_t*   _user_commands;
@@ -109,6 +116,17 @@ cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv)
   cli_printf(intf, "silicon revision %d, ", chip_info.revision);
   cli_printf(intf, "%dMB %s flash"CLI_EOL, spi_flash_get_chip_size() / (1024 * 1024),
       (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+}
+
+static void
+cli_command_systime(cli_intf_t* intf, int argc, const char** argv)
+{
+  struct timeval tv;
+
+  gettimeofday(&tv, NULL);
+
+  cli_printf(intf, CLI_EOL);
+  cli_printf(intf, "uptime: %d"CLI_EOL, tv.tv_sec);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
