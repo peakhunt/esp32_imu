@@ -31,8 +31,6 @@ struct __stream
 
 extern void stream_init_with_fd(io_driver_t* driver, stream_t* stream, int fd, uint8_t* rx_buf, int rx_buf_size, int tx_buf_size);
 extern void stream_deinit(stream_t* stream);
-extern void stream_start(stream_t* stream);
-extern void stream_stop(stream_t* stream);
 extern bool stream_write(stream_t* stream, uint8_t* data, int len);
 
 #endif /* !__STREAM_DEF_H__ */

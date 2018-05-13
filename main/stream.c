@@ -115,21 +115,12 @@ void
 stream_deinit(stream_t* stream)
 {
   circ_buffer_deinit(&stream->tx_buf);
-  stream_stop(stream);
-  close(stream->watcher.fd);
-}
 
-void
-stream_start(stream_t* stream)
-{
-}
-
-void
-stream_stop(stream_t* stream)
-{
   io_driver_no_watch(stream->driver, &stream->watcher, IO_DRIVER_EVENT_RX);
   io_driver_no_watch(stream->driver, &stream->watcher, IO_DRIVER_EVENT_TX);
   io_driver_no_watch(stream->driver, &stream->watcher, IO_DRIVER_EVENT_EX);
+
+  close(stream->watcher.fd);
 }
 
 bool

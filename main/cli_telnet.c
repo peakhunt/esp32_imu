@@ -98,8 +98,6 @@ alloc_cli_connection(cli_server_t* server, int newsd)
 
   cli_intf_register(&conn->cli_intf);
 
-  stream_start(&conn->stream);
-
   conn->telnet.databack = telnet_rx_databack;
   conn->telnet.cmdback  = telnet_rx_cmdback;
   telnet_reader_init(&conn->telnet);
