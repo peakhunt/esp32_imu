@@ -39,6 +39,7 @@ typedef struct
 
 extern void io_driver_init(io_driver_t* driver);
 extern void io_driver_run(io_driver_t* driver);
+extern void io_driver_watcher_init(io_driver_watcher_t* watcher);
 extern void io_driver_watch(io_driver_t* driver, io_driver_watcher_t* watcher, io_driver_event event);
 extern void io_driver_no_watch(io_driver_t* driver, io_driver_watcher_t* watcher, io_driver_event event);
 

@@ -6,9 +6,11 @@
 
 #include "blinky.h"
 #include "app_wifi.h"
+#include "shell.h"
 
 void app_main()
 {
   app_wifi_init();
   blinky_init();
+  shell_init();
 }

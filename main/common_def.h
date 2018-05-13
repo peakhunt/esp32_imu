@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "esp_log.h"
 
-typedef uint8_t bool;
+// typedef uint8_t bool;
 
 #define TRUE          1
 #define FALSE         0
