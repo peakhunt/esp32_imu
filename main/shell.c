@@ -99,7 +99,7 @@ shell_task(void* pvParameters)
 
   io_driver_init(&_io_driver);
 
-  cli_init(_app_commands, NARRAY(_app_commands));
+  cli_init(_app_commands, NARRAY(_app_commands), CONFIG_TELNET_PORT);
 
   while(1)
   {

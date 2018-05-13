@@ -176,12 +176,12 @@ cli_prompt(cli_intf_t* intf)
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-cli_init(cli_command_t* cmds, int num_cmds)
+cli_init(cli_command_t* cmds, int num_cmds, int port)
 {
   _user_commands      = cmds;
   _num_user_commands  = num_cmds;
 
-  cli_telnet_intf_init(7000);
+  cli_telnet_intf_init(port);
 }
 
 void

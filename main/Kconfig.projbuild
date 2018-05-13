@@ -1,4 +1,4 @@
-menu "Example Configuration"
+menu "ESP32 IMU Configuration"
 
 config BLINK_GPIO
     int "Blink GPIO number"
@@ -25,5 +25,11 @@ config WIFI_PASSWORD
     WiFi password (WPA or WPA2) for the example to use.
 
     Can be left blank if the network has no security set.
+
+config TELNET_PORT
+    int "Telnet Server Port number"
+	default 7000
+	help
+		Telnet Server Port Number for CLI access.
 
 endmenu
