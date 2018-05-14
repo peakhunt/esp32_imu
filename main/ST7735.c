@@ -545,7 +545,7 @@ spi_sw_write(unsigned char c)
     }
     else
     {
-      // log
+      // low
       gpio_set_level(SPI_MOSI_PIN, 0);
     }
     
