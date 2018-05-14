@@ -30,7 +30,6 @@ tcp_server_init(io_driver_t* driver, tcp_server_t* server, int sd, tcp_server_rx
 
   server->driver        = driver;
 
-  io_driver_watch(server->driver, &server->watcher, IO_DRIVER_EVENT_RX);
   server->watcher.fd = sd;
   server->watcher.callback = __tcp_server_watcher_callback;
 
