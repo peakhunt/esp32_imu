@@ -16,42 +16,42 @@ pipe_tcp_socket(void)
 static int
 create_pipe(int filedes[2])
 {
-	struct sockaddr_in addr = { 0 };
+	struct sockaddr_in    addr = { 0 };
+	struct sockaddr_in    adr2;
 	socklen_t addr_size = sizeof (addr);
-	struct sockaddr_in adr2;
 	socklen_t adr2_size = sizeof (adr2);
 	int listener;
 	int sock [2] = { -1, -1 };
 
-	if ((listener = pipe_tcp_socket ()) == -1)
+	if ((listener = pipe_tcp_socket()) == -1)
 		return -1;
 
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	addr.sin_port = 0;
+	addr.sin_family       = AF_INET;
+	addr.sin_addr.s_addr  = htonl(INADDR_LOOPBACK);
+	addr.sin_port         = 0;
 
-	if (bind (listener, (struct sockaddr *)&addr, addr_size))
+	if (bind(listener, (struct sockaddr *)&addr, addr_size))
 		goto fail;
 
-	if (getsockname (listener, (struct sockaddr *)&addr, &addr_size))
+	if (getsockname(listener, (struct sockaddr *)&addr, &addr_size))
 		goto fail; 
 
-	if (listen (listener, 1))
+	if (listen(listener, 1))
 		goto fail;
 
-	if ((sock [0] = pipe_tcp_socket ()) == -1)
+	if ((sock[0] = pipe_tcp_socket()) == -1)
 		goto fail;
 
-	if (connect (sock [0], (struct sockaddr *)&addr, addr_size))
+	if (connect(sock[0], (struct sockaddr *)&addr, addr_size))
 		goto fail;
 
 	if ((sock [1] = accept (listener, 0, 0)) == -1)
 		goto fail;
 
-	if (getpeername (sock [0], (struct sockaddr *)&addr, &addr_size))
+	if (getpeername(sock[0], (struct sockaddr *)&addr, &addr_size))
 		goto fail;
 
-	if (getsockname (sock [1], (struct sockaddr *)&adr2, &adr2_size))
+	if (getsockname(sock[1], (struct sockaddr *)&adr2, &adr2_size))
 		goto fail;
 
 	if (addr_size != adr2_size
@@ -61,16 +61,17 @@ create_pipe(int filedes[2])
 
 	close(listener);
 
-	filedes [0] = sock [0];
-	filedes [1] = sock [1];
+	filedes[0] = sock[0];
+	filedes[1] = sock[1];
+
 	return 0;
 
 fail:
   ESP_LOGE(TAG, "failed to create pipe");
-	close (listener);
+	close(listener);
 
-	if (sock [0] != -1) close(sock [0]);
-	if (sock [1] != -1) close(sock [1]);
+	if(sock[0] != -1) close(sock[0]);
+	if(sock[1] != -1) close(sock[1]);
 
 	return -1;
 }
