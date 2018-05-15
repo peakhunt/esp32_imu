@@ -28,7 +28,7 @@ void print_page1(void)
     sprintf(buffer, "Mask : %-14s", ip4addr_ntoa(&info.netmask));
     st7735_drawstring(0, 3, buffer, ST7735_WHITE);
 
-    sprintf(buffer, "GW   : %-14s", ip4addr_ntoa(&info.netmask));
+    sprintf(buffer, "GW   : %-14s", ip4addr_ntoa(&info.gw));
     st7735_drawstring(0, 4, buffer, ST7735_WHITE);
   }
   else
