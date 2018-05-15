@@ -28,6 +28,7 @@ static void cli_command_systime(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_nvs(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_restart(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_wifi(cli_intf_t* intf, int argc, const char** argv);
 
 static const char* TAG   = "shell";
 
@@ -60,6 +61,11 @@ static cli_command_t    _app_commands[] =
     "restart",
     "restart the chip",
     cli_command_restart,
+  },
+  {
+    "wifi",
+    "configure wifi STA",
+    cli_command_wifi,
   }
 };
 
@@ -270,6 +276,42 @@ static void
 cli_command_restart(cli_intf_t* intf, int argc, const char** argv)
 {
   esp_restart();
+}
+
+static void
+cli_command_wifi(cli_intf_t* intf, int argc, const char** argv)
+{
+  esp_err_t   err;
+  nvs_handle  my_handle;
+
+  if(argc < 2) goto command_error;
+
+  err = nvs_open("storage", NVS_READWRITE,  &my_handle);
+  if(err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
+  {
+    cli_printf(intf, "Failed to open NVS"CLI_EOL);
+    return;
+  }
+
+  nvs_set_str(my_handle, "ap", argv[1]);
+  if(argc == 3)
+  {
+    nvs_set_str(my_handle, "pass", argv[2]);
+  }
+  else
+  {
+    char t[1] = "\0";
+    nvs_set_str(my_handle, "pass", t);
+  }
+
+  nvs_commit(my_handle);
+  nvs_close(my_handle);
+
+  return;
+
+command_error:
+  cli_printf(intf, "command error"CLI_EOL);
+  cli_printf(intf, "wifi <ssid> [optional password]"CLI_EOL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

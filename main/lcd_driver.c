@@ -10,10 +10,18 @@ static const char* TAG = "lcd driver";
 void lcd_driver_task(void *pvParameter)
 {
   st7735_initr(INITR_144GREENTAB);
-  st7735_fillscreen(ST7735_BLACK);
-
+  
   while(1)
   {
+    st7735_fillscreen(ST7735_BLUE);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    st7735_fillscreen(ST7735_RED);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    st7735_fillscreen(ST7735_GREEN);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    st7735_fillscreen(ST7735_YELLOW);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    st7735_fillscreen(ST7735_WHITE);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }
