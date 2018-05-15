@@ -22,13 +22,13 @@ void print_page1(void)
   {
     st7735_drawstring(0, 1, "IP Addreess Info     ", ST7735_WHITE);
 
-    sprintf(buffer, "IP   : %-14s", ip4addr_ntoa(&info.ip));
+    sprintf(buffer, "IP  :%-16s", ip4addr_ntoa(&info.ip));
     st7735_drawstring(0, 2, buffer, ST7735_WHITE);
 
-    sprintf(buffer, "Mask : %-14s", ip4addr_ntoa(&info.netmask));
+    sprintf(buffer, "Mask:%-16s", ip4addr_ntoa(&info.netmask));
     st7735_drawstring(0, 3, buffer, ST7735_WHITE);
 
-    sprintf(buffer, "GW   : %-14s", ip4addr_ntoa(&info.gw));
+    sprintf(buffer, "GW  :%-16s", ip4addr_ntoa(&info.gw));
     st7735_drawstring(0, 4, buffer, ST7735_WHITE);
   }
   else
