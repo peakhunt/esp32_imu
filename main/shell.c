@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <sys/time.h>
+#include <string.h>
 #include "list.h"
 #include "shell.h"
 #include "io_driver.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -24,6 +26,8 @@
 static void cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_systime(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_nvs(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_restart(cli_intf_t* intf, int argc, const char** argv);
 
 static const char* TAG   = "shell";
 
@@ -47,6 +51,16 @@ static cli_command_t    _app_commands[] =
     "show IP address information",
     cli_command_ipinfo,
   },
+  {
+    "nvs",
+    "nvs manipulation command",
+    cli_command_nvs,
+  },
+  {
+    "restart",
+    "restart the chip",
+    cli_command_restart,
+  }
 };
 
 
@@ -103,6 +117,159 @@ cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv)
   {
     cli_printf(intf, "IP address is not yet configured"CLI_EOL);
   }
+}
+
+static void
+cli_command_nvs(cli_intf_t* intf, int argc, const char** argv)
+{
+  typedef enum {
+    nvs_read,
+    nvs_write,
+    nvs_erase,
+  } nvs_op_t;
+
+  nvs_op_t    op;
+  esp_err_t   err;
+  nvs_handle  my_handle;
+
+  cli_printf(intf, CLI_EOL);
+
+  if(argc < 3) goto command_error;
+
+  if(strcmp(argv[1], "read") == 0)
+  {
+    if(argc != 4) goto command_error;
+
+    op = nvs_read;
+  }
+  else if(strcmp(argv[1], "write") == 0)
+  {
+    if(argc != 5) goto command_error;
+
+    op = nvs_write;
+  }
+  else if(strcmp(argv[1], "erase") == 0)
+  {
+    if(argc != 3) goto command_error;
+
+    op = nvs_erase;
+  }
+  else
+  {
+    goto command_error;
+  }
+
+  if(op == nvs_read || op == nvs_write)
+  {
+    if(!(strcmp(argv[2], "int")  == 0 || strcmp(argv[2], "str") == 0)) goto command_error;
+  }
+
+  err = nvs_open("storage", NVS_READWRITE,  &my_handle);
+  if(err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
+  {
+    cli_printf(intf, "Failed to open NVS"CLI_EOL);
+    return;
+  }
+
+  switch(op)
+  {
+  case nvs_read:
+    if(argv[2][0] == 'i')
+    {
+      int32_t   v;
+
+      err = nvs_get_i32(my_handle, argv[3], &v);
+      if(err == ESP_OK)
+      {
+        cli_printf(intf, "%s: %d"CLI_EOL, argv[3], v);
+      }
+    }
+    else
+    {
+      size_t     len;
+
+      err = nvs_get_str(my_handle, argv[3], NULL, &len);
+      if(err == ESP_OK)
+      {
+        char*   v;
+
+        v = malloc(len);
+        nvs_get_str(my_handle, argv[3], v, &len);
+
+        cli_printf(intf, "%s: %s"CLI_EOL, argv[3], v);
+
+        free(v);
+      }
+    }
+
+    if(err != ESP_OK)
+    {
+      cli_printf(intf, "failed to get %s"CLI_EOL, argv[3]);
+    }
+    break;
+
+  case nvs_write:
+    if(argv[2][0] == 'i')
+    {
+      int32_t   v = atoi(argv[4]);
+
+      err = nvs_set_i32(my_handle, argv[3], v);
+      nvs_commit(my_handle);
+
+      if(err == ESP_OK)
+      {
+        cli_printf(intf, "set %s to %d"CLI_EOL, argv[3], v);
+      }
+      else
+      {
+        cli_printf(intf, "failed to set %s to %d"CLI_EOL, argv[3], v);
+      }
+    }
+    else
+    {
+      err = nvs_set_str(my_handle, argv[3], argv[4]);
+      nvs_commit(my_handle);
+
+      if(err == ESP_OK)
+      {
+        cli_printf(intf, "set %s to %s"CLI_EOL, argv[3], argv[4]);
+      }
+      else
+      {
+        cli_printf(intf, "failed set %s to %s"CLI_EOL, argv[3], argv[4]);
+      }
+    }
+    break;
+
+  case nvs_erase:
+    err = nvs_erase_key(my_handle, argv[2]);
+    nvs_commit(my_handle);
+
+    if(err == ESP_OK)
+    {
+      cli_printf(intf, "deleted %s"CLI_EOL, argv[2]);
+    }
+    else
+    {
+      cli_printf(intf, "failed to delete %s"CLI_EOL, argv[2]);
+    }
+    break;
+  }
+
+  nvs_close(my_handle);
+  return;
+
+command_error:
+  cli_printf(intf, "command error"CLI_EOL);
+  cli_printf(intf, "nvs read [int|str] name"CLI_EOL);
+  cli_printf(intf, "nvs write [int|str] name value"CLI_EOL);
+  cli_printf(intf, "nvs erase name"CLI_EOL);
+}
+
+static void
+cli_command_restart(cli_intf_t* intf, int argc, const char** argv)
+{
+  esp_restart();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
