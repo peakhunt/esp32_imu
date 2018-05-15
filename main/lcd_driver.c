@@ -34,6 +34,9 @@ void print_page1(void)
   else
   {
     st7735_drawstring(0, 1, "Obtaining IP Address ", ST7735_WHITE);
+    st7735_drawstring(0, 2, "                     ", ST7735_WHITE);
+    st7735_drawstring(0, 3, "                     ", ST7735_WHITE);
+    st7735_drawstring(0, 4, "                     ", ST7735_WHITE);
   }
 }
 

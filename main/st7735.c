@@ -1229,7 +1229,7 @@ st7735_plotdbfs(int32_t y)
 void
 st7735_plotnext(void)
 {
-  if(X==127)
+  if(X == 127)
   {
     X = 0;
   }
@@ -1242,7 +1242,7 @@ st7735_plotnext(void)
 void
 st7735_plotnexterase(void)
 {
-  if(X==127)
+  if(X == 127)
   {
     X = 0;
   }
@@ -1250,7 +1250,7 @@ st7735_plotnexterase(void)
   {
     X++;
   }
-  st7735_drawfastvline(X,32,128,st7735_color565(228,228,228));
+  st7735_drawfastvline(X, 32, 128, st7735_color565(228,228,228));
 }
 
 void
