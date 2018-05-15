@@ -972,12 +972,17 @@ st7735_drawchar(int16_t x, int16_t y, char c, int16_t textColor, int16_t bgColor
 uint32_t st7735_drawstring(uint16_t x, uint16_t y, char *pt, int16_t textColor)
 {
   uint32_t count = 0;
-  if(y>15) return 0;
-  while(*pt){
+
+  if(y > 15)
+    return 0;
+
+  while(*pt)
+  {
     st7735_drawchars(x*6, y*10, *pt, textColor, ST7735_BLACK, 1);
     pt++;
     x = x+1;
-    if(x>20) return count;  // number of characters printed
+    if(x > 20)
+      return count;  // number of characters printed
     count++;
   }
   return count;  // number of characters printed
