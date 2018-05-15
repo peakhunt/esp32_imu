@@ -1304,8 +1304,8 @@ st7735_output_clear(void)
 void
 st7735_output_off(void)
 {
-  st7735_output_clear();  // not implemented
-  // writecommand(0x10);   // sleep in
+  // st7735_output_clear();  // not implemented
+  writecommand(ST7735_SLPIN);   // sleep in
 }
 
 void

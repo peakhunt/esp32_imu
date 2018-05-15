@@ -15,14 +15,14 @@ enum initRFlags
 
 
 // Color definitions
-#define ST7735_BLACK   0x0000
-#define ST7735_BLUE    0xF800
-#define ST7735_RED     0x001F
-#define ST7735_GREEN   0x07E0
-#define ST7735_CYAN    0xFFE0
-#define ST7735_MAGENTA 0xF81F
-#define ST7735_YELLOW  0x07FF
-#define ST7735_WHITE   0xFFFF
+#define ST7735_BLACK    0x0000
+#define ST7735_BLUE     0x001F
+#define ST7735_RED      0xF800
+#define ST7735_GREEN    0x07E0
+#define ST7735_CYAN     0x07FF
+#define ST7735_MAGENTA  0xF81F
+#define ST7735_YELLOW   0xFFE0
+#define ST7735_WHITE    0xFFFF
 
 void st7735_initb(void);
 void st7735_initr(enum initRFlags option);
