@@ -14,6 +14,8 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 
+#include "app_wifi.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // private prototypes
@@ -21,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 static void cli_command_sysinfo(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_systime(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv);
 
 static const char* TAG   = "shell";
 
@@ -38,6 +41,11 @@ static cli_command_t    _app_commands[] =
     "systime",
     "show system uptime",
     cli_command_systime,
+  },
+  {
+    "ipinfo",
+    "show IP address information",
+    cli_command_ipinfo,
   }
 };
 
@@ -73,6 +81,28 @@ cli_command_systime(cli_intf_t* intf, int argc, const char** argv)
 
   cli_printf(intf, CLI_EOL);
   cli_printf(intf, "uptime: %d"CLI_EOL, tv.tv_sec);
+}
+
+static void
+cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv)
+{
+  tcpip_adapter_ip_info_t   info;
+  bool                      is_configured;
+
+  app_wifi_get_config(&info,  &is_configured);
+
+  cli_printf(intf, CLI_EOL);
+
+  if(is_configured)
+  {
+    cli_printf(intf, "IP Address   : %s"CLI_EOL, ip4addr_ntoa(&info.ip));
+    cli_printf(intf, "Subnet Mask  : %s"CLI_EOL, ip4addr_ntoa(&info.netmask));
+    cli_printf(intf, "Gateway      : %s"CLI_EOL, ip4addr_ntoa(&info.gw));
+  }
+  else
+  {
+    cli_printf(intf, "IP address is not yet configured"CLI_EOL);
+  }
 }
 
 
