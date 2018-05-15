@@ -9,7 +9,6 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "esp_system.h"
-#include "nvs_flash.h"
 
 #include "app_wifi.h"
 
@@ -81,13 +80,6 @@ void
 app_wifi_init(void)
 {
   _mutex = xSemaphoreCreateMutex();
-
-  esp_err_t ret = nvs_flash_init();
-  if(ret == ESP_ERR_NVS_NO_FREE_PAGES) {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ret = nvs_flash_init();
-  }
-  ESP_ERROR_CHECK(ret);
 
 	tcpip_adapter_init();
 

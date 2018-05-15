@@ -46,7 +46,7 @@ static cli_command_t    _app_commands[] =
     "ipinfo",
     "show IP address information",
     cli_command_ipinfo,
-  }
+  },
 };
 
 
@@ -104,7 +104,6 @@ cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv)
     cli_printf(intf, "IP address is not yet configured"CLI_EOL);
   }
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //
