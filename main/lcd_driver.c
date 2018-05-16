@@ -12,31 +12,35 @@ void print_page1(void)
 {
   tcpip_adapter_ip_info_t   info;
   bool                      is_configured;
+  char                      ssid[32];
   char                      buffer[32];
 
-  app_wifi_get_config(&info,  &is_configured);
+  app_wifi_get_config(&info,  ssid, &is_configured);
 
   st7735_drawstring(0, 0, "System Ready         ", ST7735_WHITE);
 
+  sprintf(buffer, "SSID:%-16s", ssid);
+  st7735_drawstring(0, 1, buffer, ST7735_WHITE);
+
   if(is_configured)
   {
-    st7735_drawstring(0, 1, "IP Addreess Info     ", ST7735_WHITE);
+    st7735_drawstring(0, 2, "IP Addreess Info     ", ST7735_WHITE);
 
     sprintf(buffer, "IP  :%-16s", ip4addr_ntoa(&info.ip));
-    st7735_drawstring(0, 2, buffer, ST7735_WHITE);
-
-    sprintf(buffer, "Mask:%-16s", ip4addr_ntoa(&info.netmask));
     st7735_drawstring(0, 3, buffer, ST7735_WHITE);
 
-    sprintf(buffer, "GW  :%-16s", ip4addr_ntoa(&info.gw));
+    sprintf(buffer, "Mask:%-16s", ip4addr_ntoa(&info.netmask));
     st7735_drawstring(0, 4, buffer, ST7735_WHITE);
+
+    sprintf(buffer, "GW  :%-16s", ip4addr_ntoa(&info.gw));
+    st7735_drawstring(0, 5, buffer, ST7735_WHITE);
   }
   else
   {
-    st7735_drawstring(0, 1, "Obtaining IP Address ", ST7735_WHITE);
-    st7735_drawstring(0, 2, "                     ", ST7735_WHITE);
+    st7735_drawstring(0, 2, "Obtaining IP Address ", ST7735_WHITE);
     st7735_drawstring(0, 3, "                     ", ST7735_WHITE);
     st7735_drawstring(0, 4, "                     ", ST7735_WHITE);
+    st7735_drawstring(0, 5, "                     ", ST7735_WHITE);
   }
 }
 

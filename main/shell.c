@@ -108,10 +108,13 @@ cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv)
 {
   tcpip_adapter_ip_info_t   info;
   bool                      is_configured;
+  char                      ssid[36];
 
-  app_wifi_get_config(&info,  &is_configured);
+  app_wifi_get_config(&info,  ssid, &is_configured);
 
   cli_printf(intf, CLI_EOL);
+
+  cli_printf(intf, "SSID         : %s"CLI_EOL, ssid);
 
   if(is_configured)
   {

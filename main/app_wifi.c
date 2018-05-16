@@ -9,6 +9,7 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "nvs_flash.h"
 
 #include "app_wifi.h"
 
@@ -19,6 +20,14 @@ static const char* TAG = "app_wifi";
 static tcpip_adapter_ip_info_t    _ip_info;
 static bool                       _ip_configured = FALSE;
 static SemaphoreHandle_t          _mutex;
+
+static wifi_config_t              _wifi_config =
+{
+  .sta = {
+    .ssid     = CONFIG_WIFI_SSID,
+    .password = CONFIG_WIFI_PASSWORD,
+  },
+};
 
 static void
 update_ip_info(const tcpip_adapter_ip_info_t* info)
@@ -76,10 +85,41 @@ wifi_event_handler(void* ctx, system_event_t* event)
   return ESP_OK;
 }
 
+static void
+app_wifi_read_config(void)
+{
+  esp_err_t   err;
+  nvs_handle  my_handle;
+  size_t      len;
+
+  err = nvs_open("storage", NVS_READWRITE,  &my_handle);
+
+  if(err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
+  {
+    return;
+  }
+
+  err = nvs_get_str(my_handle, "ap", NULL, &len);
+  if(err == ESP_OK)
+  {
+    nvs_get_str(my_handle, "ap", (char*)_wifi_config.sta.ssid, &len);
+  }
+
+  err = nvs_get_str(my_handle, "pass", NULL, &len);
+  if(err == ESP_OK)
+  {
+    nvs_get_str(my_handle, "pass", (char*)_wifi_config.sta.password, &len);
+  }
+
+  nvs_close(my_handle);
+}
+
 void
 app_wifi_init(void)
 {
   _mutex = xSemaphoreCreateMutex();
+
+  app_wifi_read_config();
 
 	tcpip_adapter_init();
 
@@ -92,22 +132,16 @@ app_wifi_init(void)
 
   // ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
 
-  wifi_config_t wifi_config = {
-    .sta = {
-      .ssid = TARGET_WIFI_SSID,
-      .password = TARGET_WIFI_PASS,
-    },
-  };
-
-  ESP_LOGI(TAG, "starting wifi: ssid %s", wifi_config.sta.ssid);
+  ESP_LOGI(TAG, "starting wifi: ssid %s", _wifi_config.sta.ssid);
 
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+  ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &_wifi_config));
   ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 void
-app_wifi_get_config(tcpip_adapter_ip_info_t* info, bool* is_configured)
+app_wifi_get_config(tcpip_adapter_ip_info_t* info, char ssid[32], bool* is_configured)
 {
+  strcpy(ssid, (char*)_wifi_config.sta.ssid);
   get_ip_info(info, is_configured);
 }

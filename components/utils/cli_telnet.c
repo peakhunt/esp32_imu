@@ -75,6 +75,7 @@ alloc_cli_connection(cli_server_t* server, int newsd)
   conn = malloc(sizeof(cli_connection_t));
   if(conn == NULL)
   {
+    ESP_LOGI(TAG, "malloc failed");
     close(newsd);
     return;
   }
