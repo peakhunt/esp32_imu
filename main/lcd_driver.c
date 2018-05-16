@@ -91,6 +91,21 @@ lcd_driver_task(void *pvParameter)
   
   while(1)
   {
+    switch(page_num)
+    {
+    case 1:
+      print_page1();
+      break;
+
+    case 2:
+      print_page2();
+      break;
+
+    case 3:
+      print_page3();
+      break;
+    }
+
     if(xQueueReceive(gpio_evt_queue, &pin_num, 1000 / portTICK_PERIOD_MS))
     {
       switch(pin_num)
@@ -110,20 +125,6 @@ lcd_driver_task(void *pvParameter)
       st7735_fillscreen(ST7735_BLACK);
     }
 
-    switch(page_num)
-    {
-    case 1:
-      print_page1();
-      break;
-
-    case 2:
-      print_page2();
-      break;
-
-    case 3:
-      print_page3();
-      break;
-    }
   }
 }
 
