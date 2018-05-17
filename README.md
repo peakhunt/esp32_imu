@@ -117,7 +117,7 @@ esptool.py run
 esptoo.py write_flash address your-bin
 
 ### built-in partition table
-partition table is 0x8000 with size 0xc00
+partition table is at 0x8000 with size 0xc00
 
 ### to convert binary partition table to csv
 gen_esp32part.py --verify binary_partitions.bin input_partitions.csv
