@@ -120,14 +120,15 @@ esptoo.py write_flash address your-bin
 partition table is 0x8000 with size 0xc00
 
 ### to convert binary partition table to csv
-python gen_esp32part.py --verify binary_partitions.bin input_partitions.csv
+gen_esp32part.py --verify binary_partitions.bin input_partitions.csv
 
 ### to convert csv to partition table
-python gen_esp32part.py --verify input_partitions.csv binary_partitions.bin
+gen_esp32part.py --verify input_partitions.csv binary_partitions.bin
 
 ### default esp32 partition table
   Espressif ESP32 Partition Table
-  # Name,   Type, SubType, Offset,  Size
-  nvs,      data, nvs,     0x9000,  0x6000
-  phy_init, data, phy,     0xf000,  0x1000
-  factory,  app,  factory, 0x10000, 1M
+  |Name      |Type    |SubType    |Offset     |Size      |
+  | -------- | ------ | --------- | --------- | -------- |
+  | nvs      | data   | nvs       | 0x9000    | 0x6000   |
+  | phy_init | data   | phy       | 0xf000    | 0x1000   |
+  | factory  | app    | factory   | 0x10000   | 1M       |
