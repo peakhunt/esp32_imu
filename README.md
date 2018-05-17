@@ -99,3 +99,35 @@ It can be quite annoying.
   Check it out at [Aliexpress](https://www.aliexpress.com/item/kebidu-Hot-sale-25CM-48CM-62CM-TF-to-micro-SD-card-Flex-Extension-cable-Extender-Adapter/32832944156.html?spm=2114.10010108.1000013.1.27bc4b3b74DRpO&scm=1007.13339.90158.0&scm_id=1007.13339.90158.0&scm-url=1007.13339.90158.0&pvid=2645295a-4392-4172-896b-e88ce2aafd8f&_t=pvid:2645295a-4392-4172-896b-e88ce2aafd8f,scm-url:1007.13339.90158.0)
 
   I will defer this debugging setup till the adapter arrives!
+
+## esptool.py
+### to read parition table
+esptoo.py read_flash 0x8000 0xc00 partition.img
+
+### to backup the entire flash
+esptool.py read_flash 0x0000 0x400000 backup.img
+
+### to read the MAC address
+esptool.py read_mac 
+
+### to reset
+esptool.py run
+
+### to write to flash
+esptoo.py write_flash address your-bin
+
+### built-in partition table
+partition table is 0x8000 with size 0xc00
+
+### to convert binary partition table to csv
+python gen_esp32part.py --verify binary_partitions.bin input_partitions.csv
+
+### to convert csv to partition table
+python gen_esp32part.py --verify input_partitions.csv binary_partitions.bin
+
+### default esp32 partition table
+  Espressif ESP32 Partition Table
+  # Name,   Type, SubType, Offset,  Size
+  nvs,      data, nvs,     0x9000,  0x6000
+  phy_init, data, phy,     0xf000,  0x1000
+  factory,  app,  factory, 0x10000, 1M
