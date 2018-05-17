@@ -7,6 +7,7 @@
 
 #include "blinky.h"
 #include "app_wifi.h"
+#include "imu.h"
 #include "shell.h"
 #include "lcd_driver.h"
 
@@ -20,8 +21,10 @@ void app_main()
   }
 
   ESP_ERROR_CHECK(ret);
+
   app_wifi_init();
   blinky_init();
+  imu_init();
   lcd_driver_init();
   shell_init();
 }
