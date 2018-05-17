@@ -127,6 +127,7 @@ gen_esp32part.py --verify input_partitions.csv binary_partitions.bin
 
 ### default esp32 partition table
   Espressif ESP32 Partition Table
+
   |Name      |Type    |SubType    |Offset     |Size      |
   | -------- | ------ | --------- | --------- | -------- |
   | nvs      | data   | nvs       | 0x9000    | 0x6000   |
