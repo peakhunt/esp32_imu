@@ -70,6 +70,8 @@ Pretty bad not to use H/W SPI and DMA for LCD interface.
 | CMD/DATA   | 17     |
 | RESET      | N/A    |
 
+One more thing to note is there is no pin to control LCD backlight with.
+It can be quite annoying.
 
 ## Debugger Setup
 
