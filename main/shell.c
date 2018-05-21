@@ -17,6 +17,7 @@
 #include "esp_spi_flash.h"
 
 #include "app_wifi.h"
+#include "imu_task.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -29,6 +30,7 @@ static void cli_command_ipinfo(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_nvs(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_restart(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_wifi(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv);
 
 static const char* TAG   = "shell";
 
@@ -66,6 +68,11 @@ static cli_command_t    _app_commands[] =
     "wifi",
     "configure wifi STA",
     cli_command_wifi,
+  },
+  {
+    "imu_data",
+    "show IMU data",
+    cli_command_imu_data,
   }
 };
 
@@ -315,6 +322,26 @@ cli_command_wifi(cli_intf_t* intf, int argc, const char** argv)
 command_error:
   cli_printf(intf, "command error"CLI_EOL);
   cli_printf(intf, "wifi <ssid> [optional password]"CLI_EOL);
+}
+
+static void
+cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
+{
+  int16_t       a_raw[3],
+                g_raw[3],
+                temp_raw;
+
+  imu_task_get_raw_values(a_raw, g_raw, &temp_raw);
+
+  cli_printf(intf, "AX RAW    : %d"CLI_EOL, a_raw[0]);
+  cli_printf(intf, "AY RAW    : %d"CLI_EOL, a_raw[1]);
+  cli_printf(intf, "AZ RAW    : %d"CLI_EOL, a_raw[2]);
+
+  cli_printf(intf, "GX RAW    : %d"CLI_EOL, g_raw[0]);
+  cli_printf(intf, "GY RAW    : %d"CLI_EOL, g_raw[1]);
+  cli_printf(intf, "GZ RAW    : %d"CLI_EOL, g_raw[2]);
+
+  cli_printf(intf, "T RAW     : %d"CLI_EOL, temp_raw);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -7,7 +7,7 @@
 
 #include "blinky.h"
 #include "app_wifi.h"
-#include "imu.h"
+#include "imu_task.h"
 #include "shell.h"
 #include "lcd_driver.h"
 
@@ -24,7 +24,7 @@ void app_main()
 
   app_wifi_init();
   blinky_init();
-  imu_init();
+  imu_task_init();
   lcd_driver_init();
   shell_init();
 }

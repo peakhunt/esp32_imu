@@ -1,6 +1,8 @@
 #ifndef __MPU_9250_DEF_H__
 #define __MPU_9250_DEF_H__
 
+#include "common_def.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // XXX refer to page 38 of MPU9250 Product specification
@@ -100,6 +102,6 @@ typedef enum
 
 
 extern void mpu9250_init(MPU9250_Accelerometer_t accel_sensitivity, MPU9250_Gyroscope_t gyro_sensitivity);
-
+extern bool mpu9250_read_all(int16_t accel_raw[3], int16_t gyro_raw[3], int16_t* temp_raw);
 
 #endif /* !__MPU_9250_DEF_H__ */

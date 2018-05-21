@@ -98,3 +98,23 @@ mpu9250_init(MPU9250_Accelerometer_t accel_sensitivity, MPU9250_Gyroscope_t gyro
   temp = (temp & 0xE7) | (uint8_t)gyro_sensitivity << 3;
   mpu9250_write_reg(MPU9250_GYRO_CONFIG, temp);
 }
+
+bool
+mpu9250_read_all(int16_t accel_raw[3], int16_t gyro_raw[3], int16_t* temp_raw)
+{
+  uint8_t data[14];
+
+  // read full raw data
+  mpu9250_read_data(MPU9250_ACCEL_XOUT_H, data, 14);
+
+  accel_raw[0] = (int16_t)(data[0] << 8 | data[1]);
+  accel_raw[1] = (int16_t)(data[2] << 8 | data[3]);
+  accel_raw[2] = (int16_t)(data[4] << 8 | data[5]);
+
+  *temp_raw     = (data[6] << 8 | data[7]);
+
+  gyro_raw[0]  = (int16_t)(data[8] << 8 | data[9]);
+  gyro_raw[1] = (int16_t)(data[10] << 8 | data[11]);
+  gyro_raw[2] = (int16_t)(data[12] << 8 | data[13]);
+  return TRUE;
+}
