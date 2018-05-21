@@ -30,9 +30,10 @@ webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 static inline void
 webapi_imu_status(struct mg_connection* nc, struct http_message* hm)
 {
-  struct imu_sensor_data_t data;
+  imu_sensor_data_t raw;
+  imu_data_t        data;
 
-  imu_task_get_raw_values(&data);
+  imu_task_get_raw_and_data(&raw, &data);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
@@ -42,27 +43,27 @@ webapi_imu_status(struct mg_connection* nc, struct http_message* hm)
   mg_printf_http_chunk(nc, "{\"data\": {");
 
   mg_printf_http_chunk(nc, "accel_raw: [ %d,%d,%d ],",
-      data.accel_raw[0],
-      data.accel_raw[1],
-      data.accel_raw[2]);
+      raw.accel[0],
+      raw.accel[1],
+      raw.accel[2]);
   mg_printf_http_chunk(nc, "accel: [%.2f, %.2f, %.2f],",
       data.accel[0],
       data.accel[1],
       data.accel[2]);
 
   mg_printf_http_chunk(nc, "gyro_raw: [ %d,%d,%d ],",
-      data.gyro_raw[0],
-      data.gyro_raw[1],
-      data.gyro_raw[2]);
+      raw.gyro[0],
+      raw.gyro[1],
+      raw.gyro[2]);
   mg_printf_http_chunk(nc, "gyro: [%.2f, %.2f, %.2f],",
       data.gyro[0],
       data.gyro[1],
       data.gyro[2]);
 
   mg_printf_http_chunk(nc, "mag_raw: [ %d,%d,%d ],",
-      data.mag_raw[0],
-      data.mag_raw[1],
-      data.mag_raw[2]);
+      raw.mag[0],
+      raw.mag[1],
+      raw.mag[2]);
   mg_printf_http_chunk(nc, "mag: [%.2f, %.2f, %.2f]",
       data.mag[0],
       data.mag[1],

@@ -2,6 +2,7 @@
 #define __MPU_9250_DEF_H__
 
 #include "common_def.h"
+#include "imu.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -120,16 +121,13 @@ typedef struct
 {
   MPU9250_Accelerometer_t   accel_config;
   MPU9250_Gyroscope_t       gyro_config;
-
-  float     accel_lsb;        // 1g unit
-  float     gyro_lsb;         // deg per sec
 } mpu9250_t;
-
-struct imu_sensor_data_t;
 
 extern void mpu9250_init(mpu9250_t* mpu9250,
     MPU9250_Accelerometer_t accel_sensitivity,
-    MPU9250_Gyroscope_t gyro_sensitivity);
-extern bool mpu9250_read_all(mpu9250_t* mpu9250, struct imu_sensor_data_t* data);
+    MPU9250_Gyroscope_t gyro_sensitivity,
+    imu_raw_to_real_t* lsb);
+
+extern bool mpu9250_read_all(mpu9250_t* mpu9250, imu_sensor_data_t* data);
 
 #endif /* !__MPU_9250_DEF_H__ */

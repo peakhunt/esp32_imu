@@ -1,7 +1,5 @@
 #include "mpu9250.h"
 #include "mpu9250_i2c.h"
-#include "imu_task.h"
-
 #include "esp_log.h"
 #include "sdkconfig.h"
 
@@ -136,7 +134,7 @@ ak8963_read_data(uint8_t reg, uint8_t* data, uint8_t len)
 } 
 
 static void
-ak8963_init(void)
+ak8963_init(mpu9250_t* mpu9250)
 {
   uint8_t   v;
 
@@ -153,19 +151,15 @@ ak8963_init(void)
 }
 
 static void
-ak8963_read_all(struct imu_sensor_data_t* imu)
+ak8963_read_all(imu_sensor_data_t* imu)
 {
   uint8_t   data[7];
 
   ak8963_read_data(AK8963_HXL, data, 7);
 
-  imu->mag_raw[0] = (int16_t)(data[1] << 8 | data[0]);
-  imu->mag_raw[1] = (int16_t)(data[3] << 8 | data[2]);
-  imu->mag_raw[2] = (int16_t)(data[5] << 8 | data[4]);
-
-  imu->mag[0] = imu->mag_raw[0] * AK8963_MAG_LSB;
-  imu->mag[1] = imu->mag_raw[1] * AK8963_MAG_LSB;
-  imu->mag[2] = imu->mag_raw[2] * AK8963_MAG_LSB;
+  imu->mag[0] = (int16_t)(data[1] << 8 | data[0]);
+  imu->mag[1] = (int16_t)(data[3] << 8 | data[2]);
+  imu->mag[2] = (int16_t)(data[5] << 8 | data[4]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +170,8 @@ ak8963_read_all(struct imu_sensor_data_t* imu)
 void
 mpu9250_init(mpu9250_t* mpu9250,
     MPU9250_Accelerometer_t accel_sensitivity,
-    MPU9250_Gyroscope_t gyro_sensitivity)
+    MPU9250_Gyroscope_t gyro_sensitivity,
+    imu_raw_to_real_t* lsb)
 {
   mpu9250_i2c_init();
 
@@ -198,44 +193,55 @@ mpu9250_init(mpu9250_t* mpu9250,
   temp = (temp & 0xE7) | (uint8_t)gyro_sensitivity << 3;
   mpu9250_write_reg(MPU9250_GYRO_CONFIG, temp);
 
-  mpu9250->accel_lsb = _accel_lsbs[accel_sensitivity];
-  mpu9250->gyro_lsb  = _gyro_lsbs[gyro_sensitivity];
-  
   // enable bypass mode to access AK8963
   mpu9250_write_reg(55, 0x02);
 
-  ak8963_init();
+  ak8963_init(mpu9250);
+
+  lsb->accel_lsb  = _accel_lsbs[accel_sensitivity];
+  lsb->gyro_lsb   = _gyro_lsbs[gyro_sensitivity];
+  lsb->mag_lsb    = AK8963_MAG_LSB;
 }
 
 bool
-mpu9250_read_all(mpu9250_t* mpu9250, struct imu_sensor_data_t* imu)
+mpu9250_read_all(mpu9250_t* mpu9250, imu_sensor_data_t* imu)
 {
   uint8_t data[14];
 
   // read full raw data
   mpu9250_read_data(MPU9250_ACCEL_XOUT_H, data, 14);
 
-  imu->accel_raw[0] = (int16_t)(data[0] << 8 | data[1]);
-  imu->accel_raw[1] = (int16_t)(data[2] << 8 | data[3]);
-  imu->accel_raw[2] = (int16_t)(data[4] << 8 | data[5]);
+  imu->accel[0] = (int16_t)(data[0] << 8 | data[1]);
+  imu->accel[1] = (int16_t)(data[2] << 8 | data[3]);
+  imu->accel[2] = (int16_t)(data[4] << 8 | data[5]);
 
-  imu->accel[0] = imu->accel_raw[0] * mpu9250->accel_lsb;
-  imu->accel[1] = imu->accel_raw[1] * mpu9250->accel_lsb;
-  imu->accel[2] = imu->accel_raw[2] * mpu9250->accel_lsb;
+  imu->temp     = (data[6] << 8 | data[7]);
 
-
-  imu->temp_raw     = (data[6] << 8 | data[7]);
-  imu->temp = (imu->temp_raw / 340333.87f + 21.0f);
-
-  imu->gyro_raw[0]  = (int16_t)(data[8] << 8 | data[9]);
-  imu->gyro_raw[1]  = (int16_t)(data[10] << 8 | data[11]);
-  imu->gyro_raw[2]  = (int16_t)(data[12] << 8 | data[13]);
-
-  imu->gyro[0]  = imu->gyro_raw[0] * mpu9250->gyro_lsb;
-  imu->gyro[1]  = imu->gyro_raw[1] * mpu9250->gyro_lsb;
-  imu->gyro[2]  = imu->gyro_raw[2] * mpu9250->gyro_lsb;
+  imu->gyro[0]  = (int16_t)(data[8] << 8 | data[9]);
+  imu->gyro[1]  = (int16_t)(data[10] << 8 | data[11]);
+  imu->gyro[2]  = (int16_t)(data[12] << 8 | data[13]);
 
   ak8963_read_all(imu);
 
   return TRUE;
 }
+
+/*
+void
+mpu9250_convert_to_eng_units(mpu9250_t* mpu9250, imu_sensor_data_t* imu)
+{
+  imu->accel[0] = imu->accel_raw[0] * mpu9250->accel_lsb;
+  imu->accel[1] = imu->accel_raw[1] * mpu9250->accel_lsb;
+  imu->accel[2] = imu->accel_raw[2] * mpu9250->accel_lsb;
+
+  imu->temp = (imu->temp_raw / 340333.87f + 21.0f);
+
+  imu->gyro[0]  = imu->gyro_raw[0] * mpu9250->gyro_lsb;
+  imu->gyro[1]  = imu->gyro_raw[1] * mpu9250->gyro_lsb;
+  imu->gyro[2]  = imu->gyro_raw[2] * mpu9250->gyro_lsb;
+
+  imu->mag[0] = imu->mag_raw[0] * mpu9250->mag_lsb;
+  imu->mag[1] = imu->mag_raw[1] * mpu9250->mag_lsb;
+  imu->mag[2] = imu->mag_raw[2] * mpu9250->mag_lsb;
+}
+ */
