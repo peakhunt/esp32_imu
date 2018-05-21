@@ -9,7 +9,11 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#include "mpu9250.h"
+
 #include "sdkconfig.h"
+
 
 const static char* TAG = "imu";
 
@@ -17,6 +21,8 @@ static void
 imu_task(void* pvParameters)
 {
   ESP_LOGI(TAG, "starting imu task");
+
+  mpu9250_init(MPU9250_Accelerometer_8G, MPU9250_Gyroscope_500s);
 
   while(1)
   {
