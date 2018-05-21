@@ -24,17 +24,19 @@ static SemaphoreHandle_t          _mutex;
 static imu_t                      _imu_data;
 
 static void
+__convert_raw_to_eng(imu_t* imu)
+{
+  // FIXME
+  // accel/gyro conversion
+
+  imu->temp = (imu->temp_raw / 340333.87f + 21.0f);
+}
+
+static void
 __read_raw_imu_data(imu_t* imu)
 {
-  xSemaphoreTake(_mutex, portMAX_DELAY);
-
   // read full raw data
-  if(mpu9250_read_all(imu->accel_raw, imu->gyro_raw, &imu->temp_raw) == FALSE)
-  {
-    return;
-  }
-
-  xSemaphoreGive(_mutex);
+  mpu9250_read_all(imu->accel_raw, imu->gyro_raw, &imu->temp_raw);
 }
 
 static void
@@ -47,7 +49,12 @@ imu_task(void* pvParameters)
 
   while(1)
   {
+    xSemaphoreTake(_mutex, portMAX_DELAY);
+
     __read_raw_imu_data(&_imu_data);
+    __convert_raw_to_eng(&_imu_data);
+
+    xSemaphoreGive(_mutex);
 
     vTaskDelay(IMU_POLL_INTERVAL / portTICK_PERIOD_MS);
   }
@@ -64,19 +71,11 @@ imu_task_init(void)
 }
 
 void
-imu_task_get_raw_values(int16_t a[3], int16_t g[3], int16_t* temp)
+imu_task_get_raw_values(imu_t* imu)
 {
   xSemaphoreTake(_mutex, portMAX_DELAY);
 
-  a[0] = _imu_data.accel_raw[0];
-  a[1] = _imu_data.accel_raw[1];
-  a[2] = _imu_data.accel_raw[2];
-
-  g[0] = _imu_data.gyro_raw[0];
-  g[1] = _imu_data.gyro_raw[1];
-  g[2] = _imu_data.gyro_raw[2];
-
-  *temp = _imu_data.temp_raw;
+  memcpy(imu, &_imu_data, sizeof(imu_t));
 
   xSemaphoreGive(_mutex);
 }
