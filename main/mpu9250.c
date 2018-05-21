@@ -155,9 +155,9 @@ ak8963_init(void)
 static void
 ak8963_read_all(struct imu_sensor_data_t* imu)
 {
-  uint8_t   data[6];
+  uint8_t   data[7];
 
-  ak8963_read_data(AK8963_HXL, data, 6);
+  ak8963_read_data(AK8963_HXL, data, 7);
 
   imu->mag_raw[0] = (int16_t)(data[1] << 8 | data[0]);
   imu->mag_raw[1] = (int16_t)(data[3] << 8 | data[2]);
