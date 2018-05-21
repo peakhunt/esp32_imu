@@ -346,6 +346,13 @@ cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
   cli_printf(intf, "gyro Y     : %-5.2f deg/S"CLI_EOL, data.gyro[1]);
   cli_printf(intf, "gyro Z     : %-5.2f deg/S"CLI_EOL, data.gyro[2]);
 
+  cli_printf(intf, "Mag   Raw X: %d"CLI_EOL, data.mag_raw[0]);
+  cli_printf(intf, "Mag   Raw Y: %d"CLI_EOL, data.mag_raw[1]);
+  cli_printf(intf, "Mag   Raw Z: %d"CLI_EOL, data.mag_raw[2]);
+  cli_printf(intf, "Mag  X     : %-5.2f uT"CLI_EOL, data.mag[0]);
+  cli_printf(intf, "Mag  Y     : %-5.2f uT"CLI_EOL, data.mag[1]);
+  cli_printf(intf, "Mag  Z     : %-5.2f uT"CLI_EOL, data.mag[2]);
+
   cli_printf(intf, "T RAW      : %d"CLI_EOL, data.temp_raw);
   cli_printf(intf, "Temp       : %-5.2f Celcius"CLI_EOL, data.temp);
 }

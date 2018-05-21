@@ -7,6 +7,22 @@
 
 const static char* TAG = "mpu9250";
 
+static const float _accel_lsbs[] =
+{
+  1.0f / MPU9250_ACCE_SENS_2,
+  1.0f / MPU9250_ACCE_SENS_4,
+  1.0f / MPU9250_ACCE_SENS_8,
+  1.0f / MPU9250_ACCE_SENS_16,
+};
+
+static const float _gyro_lsbs[] = 
+{
+  1.0f / MPU9250_GYRO_SENS_250,
+  1.0f / MPU9250_GYRO_SENS_500,
+  1.0f / MPU9250_GYRO_SENS_1000,
+  1.0f / MPU9250_GYRO_SENS_2000,
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // private utilities
@@ -74,6 +90,84 @@ mpu9250_read_data(uint8_t reg, uint8_t* data, uint8_t len)
   }
 } 
 
+static inline uint8_t
+ak8963_read_reg(uint8_t reg)
+{
+  uint8_t ret;
+
+  if(mpu9250_i2c_write(AK8963_I2C_ADDR, &reg, 1) == FALSE)
+  {
+    ESP_LOGE(TAG, "ak8963_read_reg: failed to mpu9250_i2c_write");
+  }
+
+  if(mpu9250_i2c_read(AK8963_I2C_ADDR, &ret, 1) == FALSE)
+  {
+    ESP_LOGE(TAG, "ak8963_read_reg: failed to mpu9250_i2c_read");
+  }
+  return ret;
+}
+
+static inline void
+ak8963_write_reg(uint8_t reg, uint8_t data)
+{ 
+  uint8_t buffer[2];
+
+  buffer[0] = reg;
+  buffer[1] = data;
+
+  if(mpu9250_i2c_write(AK8963_I2C_ADDR, buffer, 2) == FALSE)
+  {
+    ESP_LOGE(TAG, "ak8963_write_reg: failed to mpu9250_i2c_write");
+  }
+}
+
+static inline void
+ak8963_read_data(uint8_t reg, uint8_t* data, uint8_t len)
+{ 
+  if(mpu9250_i2c_write(AK8963_I2C_ADDR, &reg, 1) == FALSE)
+  {
+    ESP_LOGE(TAG, "ak8963_read_data: failed to mpu9250_i2c_write");
+  }
+
+  if(mpu9250_i2c_read(AK8963_I2C_ADDR, data, len) == FALSE)
+  {
+    ESP_LOGE(TAG, "ak8963_read_data: failed to mpu9250_i2c_read");
+  }
+} 
+
+static void
+ak8963_init(void)
+{
+  uint8_t   v;
+
+  v = ak8963_read_reg(AK8963_WIA);
+  ESP_LOGI(TAG, "ak8963 chip ID: %x", v);
+
+  // put ak8963 in mode 2 for 100Hz measurement
+  // also set 16 bit output
+  v = ((1 << 4) |  0x06);
+  ak8963_write_reg(AK8963_CNTL1, v);
+
+  v = ak8963_read_reg(AK8963_CNTL1);
+  ESP_LOGI(TAG, "ak8963 control reg: %x", v);
+}
+
+static void
+ak8963_read_all(struct imu_sensor_data_t* imu)
+{
+  uint8_t   data[6];
+
+  ak8963_read_data(AK8963_HXL, data, 6);
+
+  imu->mag_raw[0] = (int16_t)(data[1] << 8 | data[0]);
+  imu->mag_raw[1] = (int16_t)(data[3] << 8 | data[2]);
+  imu->mag_raw[2] = (int16_t)(data[5] << 8 | data[4]);
+
+  imu->mag[0] = imu->mag_raw[0] * AK8963_MAG_LSB;
+  imu->mag[1] = imu->mag_raw[1] * AK8963_MAG_LSB;
+  imu->mag[2] = imu->mag_raw[2] * AK8963_MAG_LSB;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // public utilities
@@ -104,43 +198,13 @@ mpu9250_init(mpu9250_t* mpu9250,
   temp = (temp & 0xE7) | (uint8_t)gyro_sensitivity << 3;
   mpu9250_write_reg(MPU9250_GYRO_CONFIG, temp);
 
-	switch (accel_sensitivity)
-  {
-  case MPU9250_Accelerometer_2G:
-    mpu9250->accel_lsb = (float)1 / MPU9250_ACCE_SENS_2;
-    break;
-
-  case MPU9250_Accelerometer_4G:
-    mpu9250->accel_lsb = (float)1 / MPU9250_ACCE_SENS_4;
-    break;
-
-  case MPU9250_Accelerometer_8G:
-    mpu9250->accel_lsb = (float)1 / MPU9250_ACCE_SENS_8;
-    break;
-
-  case MPU9250_Accelerometer_16G:
-    mpu9250->accel_lsb = (float)1 / MPU9250_ACCE_SENS_16;
-    break;
-  }
-
-  switch (gyro_sensitivity)
-  {
-  case MPU9250_Gyroscope_250s:
-    mpu9250->gyro_lsb = (float)1 / MPU9250_GYRO_SENS_250;
-    break;
+  mpu9250->accel_lsb = _accel_lsbs[accel_sensitivity];
+  mpu9250->gyro_lsb  = _gyro_lsbs[gyro_sensitivity];
   
-  case MPU9250_Gyroscope_500s:
-    mpu9250->gyro_lsb = (float)1 / MPU9250_GYRO_SENS_500;
-    break;
+  // enable bypass mode to access AK8963
+  mpu9250_write_reg(55, 0x02);
 
-  case MPU9250_Gyroscope_1000s:
-    mpu9250->gyro_lsb = (float)1 / MPU9250_GYRO_SENS_1000;
-    break;
-  
-  case MPU9250_Gyroscope_2000s:
-    mpu9250->gyro_lsb = (float)1 / MPU9250_GYRO_SENS_2000;
-    break;
-  }
+  ak8963_init();
 }
 
 bool
@@ -170,6 +234,8 @@ mpu9250_read_all(mpu9250_t* mpu9250, struct imu_sensor_data_t* imu)
   imu->gyro[0]  = imu->gyro_raw[0] * mpu9250->gyro_lsb;
   imu->gyro[1]  = imu->gyro_raw[1] * mpu9250->gyro_lsb;
   imu->gyro[2]  = imu->gyro_raw[2] * mpu9250->gyro_lsb;
+
+  ak8963_read_all(imu);
 
   return TRUE;
 }
