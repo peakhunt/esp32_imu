@@ -21,22 +21,13 @@
 const static char* TAG = "imu_task";
 
 static SemaphoreHandle_t          _mutex;
-static imu_t                      _imu_data;
-
-static void
-__convert_raw_to_eng(imu_t* imu)
-{
-  // FIXME
-  // accel/gyro conversion
-
-  imu->temp = (imu->temp_raw / 340333.87f + 21.0f);
-}
+static imu_t                      _imu;
 
 static void
 __read_raw_imu_data(imu_t* imu)
 {
   // read full raw data
-  mpu9250_read_all(imu->accel_raw, imu->gyro_raw, &imu->temp_raw);
+  mpu9250_read_all(&imu->mpu9250, &imu->sensor_data);
 }
 
 static void
@@ -44,15 +35,15 @@ imu_task(void* pvParameters)
 {
   ESP_LOGI(TAG, "starting imu task");
 
-  memset(&_imu_data, 0, sizeof(_imu_data));
-  mpu9250_init(MPU9250_Accelerometer_8G, MPU9250_Gyroscope_500s);
+  memset(&_imu, 0, sizeof(_imu));
+
+  mpu9250_init(&_imu.mpu9250, MPU9250_Accelerometer_8G, MPU9250_Gyroscope_500s);
 
   while(1)
   {
     xSemaphoreTake(_mutex, portMAX_DELAY);
 
-    __read_raw_imu_data(&_imu_data);
-    __convert_raw_to_eng(&_imu_data);
+    __read_raw_imu_data(&_imu);
 
     xSemaphoreGive(_mutex);
 
@@ -71,11 +62,11 @@ imu_task_init(void)
 }
 
 void
-imu_task_get_raw_values(imu_t* imu)
+imu_task_get_raw_values(struct imu_sensor_data_t* data)
 {
   xSemaphoreTake(_mutex, portMAX_DELAY);
 
-  memcpy(imu, &_imu_data, sizeof(imu_t));
+  memcpy(data, &_imu.sensor_data, sizeof(struct imu_sensor_data_t));
 
   xSemaphoreGive(_mutex);
 }

@@ -327,20 +327,27 @@ command_error:
 static void
 cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
 {
-  imu_t         imu;
+  struct imu_sensor_data_t data;
 
-  imu_task_get_raw_values(&imu);
+  imu_task_get_raw_values(&data);
 
-  cli_printf(intf, "AX RAW    : %d"CLI_EOL, imu.accel_raw[0]);
-  cli_printf(intf, "AY RAW    : %d"CLI_EOL, imu.accel_raw[1]);
-  cli_printf(intf, "AZ RAW    : %d"CLI_EOL, imu.accel_raw[2]);
+  cli_printf(intf, "Accel Raw X: %d"CLI_EOL, data.accel_raw[0]);
+  cli_printf(intf, "Accel Raw Y: %d"CLI_EOL, data.accel_raw[1]);
+  cli_printf(intf, "Accel Raw Z: %d"CLI_EOL, data.accel_raw[2]);
 
-  cli_printf(intf, "GX RAW    : %d"CLI_EOL, imu.gyro_raw[0]);
-  cli_printf(intf, "GY RAW    : %d"CLI_EOL, imu.gyro_raw[1]);
-  cli_printf(intf, "GZ RAW    : %d"CLI_EOL, imu.gyro_raw[2]);
+  cli_printf(intf, "Accel X    : %-5.2f G"CLI_EOL, data.accel[0]);
+  cli_printf(intf, "Accel Y    : %-5.2f G"CLI_EOL, data.accel[1]);
+  cli_printf(intf, "Accel Z    : %-5.2f G"CLI_EOL, data.accel[2]);
 
-  cli_printf(intf, "T RAW     : %d"CLI_EOL, imu.temp_raw);
-  cli_printf(intf, "Temp      : %.2f"CLI_EOL, imu.temp);
+  cli_printf(intf, "Gyro  Raw X: %d"CLI_EOL, data.gyro_raw[0]);
+  cli_printf(intf, "Gyro  Raw Y: %d"CLI_EOL, data.gyro_raw[1]);
+  cli_printf(intf, "Gyro  Raw Z: %d"CLI_EOL, data.gyro_raw[2]);
+  cli_printf(intf, "gyro X     : %-5.2f deg/S"CLI_EOL, data.gyro[0]);
+  cli_printf(intf, "gyro Y     : %-5.2f deg/S"CLI_EOL, data.gyro[1]);
+  cli_printf(intf, "gyro Z     : %-5.2f deg/S"CLI_EOL, data.gyro[2]);
+
+  cli_printf(intf, "T RAW      : %d"CLI_EOL, data.temp_raw);
+  cli_printf(intf, "Temp       : %-5.2f Celcius"CLI_EOL, data.temp);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
