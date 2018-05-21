@@ -58,7 +58,7 @@ imu_task_init(void)
 
   _mutex = xSemaphoreCreateMutex();
 
-  xTaskCreate(&imu_task, "imu_task", 4096, NULL, 5, NULL);
+  xTaskCreate(imu_task, "imu_task", 4096, NULL, 5, NULL);
 }
 
 void

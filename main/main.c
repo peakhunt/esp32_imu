@@ -10,6 +10,7 @@
 #include "imu_task.h"
 #include "shell.h"
 #include "lcd_driver.h"
+#include "webserver.h"
 
 void app_main()
 {
@@ -27,4 +28,5 @@ void app_main()
   imu_task_init();
   lcd_driver_init();
   shell_init();
+  webserver_init();
 }
