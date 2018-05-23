@@ -79,8 +79,6 @@ imu_task(void* pvParameters)
     }
     xSemaphoreGive(_mutex);
     _loop_cnt++;
-
-    vTaskDelay(xDelay);
   }
 }
 
@@ -95,7 +93,7 @@ imu_task_init(void)
 
   _cmd_queue = xQueueCreate(10, sizeof(uint32_t));
 
-  xTaskCreate(imu_task, "imu_task", 4096, NULL, configMAX_PRIORITIES - 1 , NULL);
+  xTaskCreate(imu_task, "imu_task", 4096, NULL, 5, NULL);
 }
 
 void

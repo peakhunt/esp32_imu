@@ -217,7 +217,6 @@ madgwick_updateIMU(madgwick_t* madgwick,
 void
 madgwick_get_roll_pitch_yaw(madgwick_t* madgwick, float data[3], float md)
 {
-#if 0
   float roll, pitch, yaw;
 
   roll  = atan2f(Q0*Q1 + Q2*Q3, 0.5f - Q1*Q1 - Q2*Q2);
@@ -232,31 +231,6 @@ madgwick_get_roll_pitch_yaw(madgwick_t* madgwick, float data[3], float md)
   {
     data[2] += 360.0f;
   }
-  //data[2] = 360.0f - data[2];   // N= 0/360, E=90, S=180, W=270
-#else
-  float roll, pitch, yaw;
-  float q[4];
-
-  q[0] = madgwick->q0;
-  q[1] = madgwick->q1;
-  q[2] = madgwick->q2;
-  q[3] = madgwick->q3;
-  
-  yaw   = atan2f(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
-  pitch = -asinf(2.0f * (q[1] * q[3] - q[0] * q[2]));
-  roll  = atan2f(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-
-  pitch *= 180.0f / M_PI;
-  yaw   *= 180.0f / M_PI;
-  // yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-  if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
-
-  roll  *= 180.0f / M_PI;
-
-  data[0] = roll;
-  data[1] = pitch;
-  data[2] = yaw;
-#endif
 }
 
 void

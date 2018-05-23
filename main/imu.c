@@ -225,9 +225,9 @@ imu_update_normal(imu_t* imu)
 #if USE_MADGWICK == 1
   // NED
   madgwick_update(&imu->filter,
-      imu->data.gyro[0],  -imu->data.gyro[1],   imu->data.gyro[2],
-      imu->data.accel[0], -imu->data.accel[1],  imu->data.accel[2],
-      imu->data.mag[0],   -imu->data.mag[1],    imu->data.mag[2]);
+      imu->data.gyro[1],  imu->data.gyro[0],   imu->data.gyro[2],
+      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
+      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
 
   madgwick_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,

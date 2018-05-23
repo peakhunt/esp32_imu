@@ -115,8 +115,7 @@ lcd_driver_task(void *pvParameter)
   st7735_setrotation(0) ;
 
   st7735_drawstring(0, 0, "Booting up...        ", ST7735_WHITE);
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-  
+
   while(1)
   {
     switch(page_num)
@@ -134,7 +133,7 @@ lcd_driver_task(void *pvParameter)
       break;
     }
 
-    if(xQueueReceive(gpio_evt_queue, &pin_num, 1000 / portTICK_PERIOD_MS))
+    if(xQueueReceive(gpio_evt_queue, &pin_num, 500 / portTICK_PERIOD_MS))
     {
       switch(pin_num)
       {
