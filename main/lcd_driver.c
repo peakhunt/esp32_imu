@@ -71,19 +71,30 @@ print_page2(void)
   imu_sensor_data_t raw;
   imu_data_t        data;
   char                      buffer[32];
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
-  st7735_drawstring(0, 0, "Page 2               ", ST7735_WHITE);
+  if(mode == imu_mode_normal)
+  {
+    st7735_drawstring(0, 0, "Page 2               ", ST7735_WHITE);
 
-  sprintf(buffer, "Roll : %-5.2f", data.orientation[0]);
-  st7735_drawstring(0, 1, buffer, ST7735_WHITE);
+    sprintf(buffer, "Roll : %-5.2f", data.orientation[0]);
+    st7735_drawstring(0, 1, buffer, ST7735_WHITE);
 
-  sprintf(buffer, "Pitch: %-5.2f", data.orientation[1]);
-  st7735_drawstring(0, 2, buffer, ST7735_WHITE);
+    sprintf(buffer, "Pitch: %-5.2f", data.orientation[1]);
+    st7735_drawstring(0, 2, buffer, ST7735_WHITE);
 
-  sprintf(buffer, "Yaw  : %-5.2f", data.orientation[2]);
-  st7735_drawstring(0, 3, buffer, ST7735_WHITE);
+    sprintf(buffer, "Yaw  : %-5.2f", data.orientation[2]);
+    st7735_drawstring(0, 3, buffer, ST7735_WHITE);
+  }
+  else
+  {
+    st7735_drawstring(0, 0, "Page 2               ", ST7735_WHITE);
+    st7735_drawstring(0, 1, "Calibrating...       ", ST7735_WHITE);
+    st7735_drawstring(0, 2, "                     ", ST7735_WHITE);
+    st7735_drawstring(0, 3, "                     ", ST7735_WHITE);
+  }
 }
 
 static void
@@ -136,7 +147,8 @@ lcd_driver_task(void *pvParameter)
         break;
 
       case BUTTON_3:
-        page_num = 3;
+        // page_num = 3;
+        imu_task_do_mag_calibration();
         break;
       }
       st7735_fillscreen(ST7735_BLACK);

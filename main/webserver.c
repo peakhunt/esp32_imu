@@ -37,8 +37,9 @@ webapi_imu_raw(struct mg_connection* nc, struct http_message* hm)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
@@ -72,8 +73,9 @@ webapi_imu_real(struct mg_connection* nc, struct http_message* hm)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
@@ -104,8 +106,9 @@ webapi_imu_orientation(struct mg_connection* nc, struct http_message* hm)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
@@ -126,8 +129,9 @@ webapi_imu_debug(struct mg_connection* nc, struct http_message* hm)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"

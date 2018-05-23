@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "imu.h"
+#include "imu_mag_calibration.h"
 
 /*
    board orientation (not flipped)
@@ -222,10 +223,11 @@ imu_update_normal(imu_t* imu)
   //    If your roll/pitch/raw values are strange, suspect this.
   //
 #if USE_MADGWICK == 1
+  // NED
   madgwick_update(&imu->filter,
-      imu->data.gyro[1],  imu->data.gyro[0],  -imu->data.gyro[2],
-      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
-      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
+      imu->data.gyro[0],  -imu->data.gyro[1],   imu->data.gyro[2],
+      imu->data.accel[0], -imu->data.accel[1],  imu->data.accel[2],
+      imu->data.mag[0],   -imu->data.mag[1],    imu->data.mag[2]);
 
   madgwick_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,
@@ -288,8 +290,24 @@ imu_update(imu_t* imu)
 
   case imu_mode_accel_calibrating:
   case imu_mode_gyro_calibrating:
+    break;
+
   case imu_mode_mag_calibrating:
-    // FIXME
+    imu_mag_calibration_update(imu->raw.mag[0], imu->raw.mag[1], imu->raw.mag[2]);
     break;
   }
+}
+
+void
+imu_start_mag_calibration(imu_t* imu)
+{
+  imu->mode = imu_mode_mag_calibrating;
+  imu_mag_calibration_init();
+}
+
+void
+imu_finish_mag_calibration(imu_t* imu)
+{
+  imu->mode = imu_mode_normal;
+  imu_mag_calibration_finish(imu->cal.mag_bias);
 }

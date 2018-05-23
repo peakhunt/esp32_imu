@@ -329,8 +329,9 @@ cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
+  imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &data);
 
   cli_printf(intf, "Accel Raw X: %d"CLI_EOL, raw.accel[0]);
   cli_printf(intf, "Accel Raw Y: %d"CLI_EOL, raw.accel[1]);

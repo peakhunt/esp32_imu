@@ -88,4 +88,7 @@ typedef struct
 extern void imu_init(imu_t* imu);
 extern void imu_update(imu_t* imu);
 
+extern void imu_start_mag_calibration(imu_t* imu);
+extern void imu_finish_mag_calibration(imu_t* imu);
+
 #endif /* !__IMU_DEF_H__ */
