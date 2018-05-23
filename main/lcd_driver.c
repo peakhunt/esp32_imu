@@ -8,6 +8,8 @@
 #include "app_wifi.h"
 #include "driver/gpio.h"
 
+#include "imu_task.h"
+
 #define BUTTON_1        35
 #define BUTTON_2        34
 #define BUTTON_3        39
@@ -66,7 +68,22 @@ print_page1(void)
 static void
 print_page2(void)
 {
+  imu_sensor_data_t raw;
+  imu_data_t        data;
+  char                      buffer[32];
+
+  imu_task_get_raw_and_data(&raw, &data);
+
   st7735_drawstring(0, 0, "Page 2               ", ST7735_WHITE);
+
+  sprintf(buffer, "Roll : %-5.2f", data.orientation[0]);
+  st7735_drawstring(0, 1, buffer, ST7735_WHITE);
+
+  sprintf(buffer, "Pitch: %-5.2f", data.orientation[1]);
+  st7735_drawstring(0, 2, buffer, ST7735_WHITE);
+
+  sprintf(buffer, "Yaw  : %-5.2f", data.orientation[2]);
+  st7735_drawstring(0, 3, buffer, ST7735_WHITE);
 }
 
 static void
@@ -84,7 +101,7 @@ lcd_driver_task(void *pvParameter)
   st7735_initr(INITR_144GREENTAB);
   st7735_fillscreen(ST7735_BLACK);
 
-  st7735_setrotation(3) ;
+  st7735_setrotation(0) ;
 
   st7735_drawstring(0, 0, "Booting up...        ", ST7735_WHITE);
   vTaskDelay(1000 / portTICK_PERIOD_MS);

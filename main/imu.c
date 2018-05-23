@@ -2,12 +2,107 @@
 #include <string.h>
 #include "imu.h"
 
+/*
+   board orientation (not flipped)
+
+          | O|=================| /|\
+          | G|       U(+z)     |  | +x
+          | T|       top       |  |
+          | T|=================|  |
+                                  |
+          <------------- y+  
+
+              gyro
+
+                clock wise rotate around Z : + (need to be inverted)
+                clock wise rotate around Y : + (ok)
+                counter clock wise rotate around X : + (ok)
+
+              accel 
+                against positive axis: +G
+                
+
+  TTGO accel/gyro align 
+
+                    /\
+                    | +y
+                    |
+            T|=================|
+            T|       U(+z)     |
+            G|      bottom     |
+            O|=================|
+               -------------> +x
+
+               flip and rotate
+
+               -------------> +x
+            O|=================|
+            G|       D(+z)     |
+            T|      top        |
+            T|=================|
+                    |
+                    | +y
+                   \|/
+
+          x = -y
+          y = -x
+          z = -z
+
+
+  TTGO mag align
+                    /\
+                    | +x
+                    |
+            T|=================|
+            T|       D(+z)     |
+            G|      bottom     |
+            O|=================|
+               -------------> +y
+
+               flip and rotate
+
+               -------------> +y
+            O|=================|
+            G|       U(+z)     |
+            T|      top        |
+            T|=================|
+                    |
+                    | +x
+                   \|/
+
+         x = -x
+         y = -y
+         z =  z
+
+  Finally NEU setup. Madgwick expects NEU not NED!
+              
+                /\
+                |   +x
+                |
+                |
+             ----------
+                TTGO
+             ----------
+                top
+                                         +y
+                         ----------------->
+
+                D(Z+)
+             ----------
+
+
+      so
+            x = y
+            y = x
+            z = z
+
+*/
 ////////////////////////////////////////////////////////////////////////////////
 //
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static void
+static inline void
 alignReading(int16_t* values, imu_board_align_t align)
 {
   const int16_t   x = values[0],
@@ -107,7 +202,7 @@ imu_calc_sensor_value(imu_t* imu)
   imu->data.mag[1] = imu->adjusted.mag[1] * imu->lsb.mag_lsb;
   imu->data.mag[2] = imu->adjusted.mag[2] * imu->lsb.mag_lsb;
 
-  imu->data.temp = ((float) imu->adjusted.temp) / 340333.87f + 21.0f;
+  imu->data.temp = ((float) imu->adjusted.temp) / 333.87f + 21.0f;
 }
 
 static void
@@ -119,14 +214,32 @@ imu_update_normal(imu_t* imu)
 
   imu_calc_sensor_value(imu);
 
+  //
+  // remember
+  // a) accel/mag is uniless. you can push in values in any unit
+  // b) gyro must be in degree per second
+  // c) madgwick expects data in NED coordinate.
+  //    If your roll/pitch/raw values are strange, suspect this.
+  //
+#if USE_MADGWICK == 1
   madgwick_update(&imu->filter,
-      imu->data.gyro[0], imu->data.gyro[1], imu->data.gyro[2],
-      imu->data.accel[0], imu->data.accel[1], imu->data.accel[2],
-      imu->data.mag[0], imu->data.mag[1], imu->data.mag[2]);
+      imu->data.gyro[1],  imu->data.gyro[0],  -imu->data.gyro[2],
+      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
+      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
 
   madgwick_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,
       imu->cal.mag_declination);
+#else
+  mahony_update(&imu->filter,
+      imu->data.gyro[1],  imu->data.gyro[0],  -imu->data.gyro[2],
+      imu->data.accel[1], imu->data.accel[0], -imu->data.accel[2],
+      imu->data.mag[1],   imu->data.mag[0],   -imu->data.mag[2]);
+
+  mahony_get_roll_pitch_yaw(&imu->filter,
+      imu->data.orientation,
+      imu->cal.mag_declination);
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,12 +262,17 @@ imu_init(imu_t* imu)
   // update_rate
   // sensor align
   //
-  imu->accel_align  = imu_board_align_cw_0;
-  imu->gyro_align   = imu_board_align_cw_0;
-  imu->mag_align    = imu_board_align_cw_0;
+  imu->accel_align  = imu_board_align_cw_270_flip;
+  imu->gyro_align   = imu_board_align_cw_270_flip;
+  imu->mag_align    = imu_board_align_cw_180;
+
   imu->update_rate  = 200;
 
+#if USE_MADGWICK == 1
   madgwick_init(&imu->filter, imu->update_rate);
+#else
+  mahony_init(&imu->filter, imu->update_rate);
+#endif
 }
 
 void

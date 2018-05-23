@@ -8,8 +8,8 @@
 // private definitions
 //
 ////////////////////////////////////////////////////////////////////////////////
-#define twoKpDef  (2.0f * 1.0f)     // 2 * proportional gain
-#define twoKiDef  (2.0f * 0.3f)     // 2 * integral gain
+#define twoKpDef  (2.0f * 0.5f)     // 2 * proportional gain
+#define twoKiDef  (2.0f * 0.0f)     // 2 * integral gain
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -23,7 +23,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 void
-mahony_init(Mahony* mahony, float sampleFrequency)
+mahony_init(mahony_t* mahony, float sampleFrequency)
 {
   mahony->twoKp = twoKpDef; // 2 * proportional gain (Kp)
   mahony->twoKi = twoKiDef; // 2 * integral gain (Ki)
@@ -41,7 +41,7 @@ mahony_init(Mahony* mahony, float sampleFrequency)
 }
 
 void
-mahony_update(Mahony* mahony,
+mahony_update(mahony_t* mahony,
 							float gx, float gy, float gz,
 							float ax, float ay, float az,
 							float mx, float my, float mz)
@@ -154,7 +154,7 @@ mahony_update(Mahony* mahony,
 }
 
 void
-mahony_updateIMU(Mahony* mahony, float gx, float gy, float gz,
+mahony_updateIMU(mahony_t* mahony, float gx, float gy, float gz,
     float ax, float ay, float az)
 {
   float recipNorm;
@@ -234,7 +234,7 @@ mahony_updateIMU(Mahony* mahony, float gx, float gy, float gz,
 
 
 void
-mahony_get_roll_pitch_yaw(Mahony* mahony, float data[3], float md)
+mahony_get_roll_pitch_yaw(mahony_t* mahony, float data[3], float md)
 {
 #define Q0    mahony->q0
 #define Q1    mahony->q1
@@ -259,7 +259,7 @@ mahony_get_roll_pitch_yaw(Mahony* mahony, float data[3], float md)
 }
 
 void
-mahony_get_quaternion(Mahony* mahony, float data[4])
+mahony_get_quaternion(mahony_t* mahony, float data[4])
 {
   data[0] = mahony->q0;
   data[1] = mahony->q1;

@@ -19,6 +19,11 @@
 
 const static char* TAG = "webserver";
 
+const static struct mg_str _imu_raw = MG_MK_STR("/imu/raw");
+const static struct mg_str _imu_real = MG_MK_STR("/imu/real");
+const static struct mg_str _imu_orientation = MG_MK_STR("/imu/orientation");
+const static struct mg_str _imu_debug = MG_MK_STR("/imu/debug");
+
 static inline void
 webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 {
@@ -28,7 +33,7 @@ webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 }
 
 static inline void
-webapi_imu_status(struct mg_connection* nc, struct http_message* hm)
+webapi_imu_raw(struct mg_connection* nc, struct http_message* hm)
 {
   imu_sensor_data_t raw;
   imu_data_t        data;
@@ -46,29 +51,97 @@ webapi_imu_status(struct mg_connection* nc, struct http_message* hm)
       raw.accel[0],
       raw.accel[1],
       raw.accel[2]);
-  mg_printf_http_chunk(nc, "accel: [%.2f, %.2f, %.2f],",
-      data.accel[0],
-      data.accel[1],
-      data.accel[2]);
 
   mg_printf_http_chunk(nc, "gyro_raw: [ %d,%d,%d ],",
       raw.gyro[0],
       raw.gyro[1],
       raw.gyro[2]);
+
+  mg_printf_http_chunk(nc, "mag_raw: [ %d,%d,%d ]",
+      raw.mag[0],
+      raw.mag[1],
+      raw.mag[2]);
+
+  mg_printf_http_chunk(nc, "}}");
+
+  mg_send_http_chunk(nc, "", 0);
+}
+
+static inline void
+webapi_imu_real(struct mg_connection* nc, struct http_message* hm)
+{
+  imu_sensor_data_t raw;
+  imu_data_t        data;
+
+  imu_task_get_raw_and_data(&raw, &data);
+
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+
+  mg_printf_http_chunk(nc, "{\"data\": {");
+  mg_printf_http_chunk(nc, "accel: [%.2f, %.2f, %.2f],",
+      data.accel[0],
+      data.accel[1],
+      data.accel[2]);
   mg_printf_http_chunk(nc, "gyro: [%.2f, %.2f, %.2f],",
       data.gyro[0],
       data.gyro[1],
       data.gyro[2]);
-
-  mg_printf_http_chunk(nc, "mag_raw: [ %d,%d,%d ],",
-      raw.mag[0],
-      raw.mag[1],
-      raw.mag[2]);
   mg_printf_http_chunk(nc, "mag: [%.2f, %.2f, %.2f]",
       data.mag[0],
       data.mag[1],
       data.mag[2]);
 
+  mg_printf_http_chunk(nc, "}}");
+
+  mg_send_http_chunk(nc, "", 0);
+}
+
+static inline void
+webapi_imu_orientation(struct mg_connection* nc, struct http_message* hm)
+{
+  imu_sensor_data_t raw;
+  imu_data_t        data;
+
+  imu_task_get_raw_and_data(&raw, &data);
+
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+
+  mg_printf_http_chunk(nc, "{\"data\": {");
+  mg_printf_http_chunk(nc, "roll: %.2f, ", data.orientation[0]);
+  mg_printf_http_chunk(nc, "pitch: %.2f, ", data.orientation[1]);
+  mg_printf_http_chunk(nc, "yaw: %.2f", data.orientation[2]);
+  mg_printf_http_chunk(nc, "}}");
+
+  mg_send_http_chunk(nc, "", 0);
+}
+
+static inline void
+webapi_imu_debug(struct mg_connection* nc, struct http_message* hm)
+{
+  imu_sensor_data_t raw;
+  imu_data_t        data;
+
+  imu_task_get_raw_and_data(&raw, &data);
+
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+
+  mg_printf_http_chunk(nc, "{\"data\": {");
+  mg_printf_http_chunk(nc, "roll: %.2f, ", data.orientation[0]);
+  mg_printf_http_chunk(nc, "pitch: %.2f, ", data.orientation[1]);
+  mg_printf_http_chunk(nc, "yaw: %.2f, ", data.orientation[2]);
+  mg_printf_http_chunk(nc, "gyro: [%.2f, %.2f, %.2f]",
+      data.gyro[0],
+      data.gyro[1],
+      data.gyro[2]);
   mg_printf_http_chunk(nc, "}}");
 
   mg_send_http_chunk(nc, "", 0);
@@ -84,9 +157,21 @@ mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
   case MG_EV_HTTP_REQUEST:
     if(mg_vcmp(&hm->method, "GET") == 0)
     {
-      if(mg_vcmp(&hm->uri, "/imu/status") == 0)
+      if(mg_strcmp(hm->uri, _imu_raw) == 0)
       {
-        webapi_imu_status(nc, hm);
+        webapi_imu_raw(nc, hm);
+      }
+      else if(mg_strcmp(hm->uri, _imu_real) == 0)
+      {
+        webapi_imu_real(nc, hm);
+      }
+      else if(mg_strcmp(hm->uri, _imu_orientation) == 0)
+      {
+        webapi_imu_orientation(nc, hm);
+      }
+      else if(mg_strcmp(hm->uri, _imu_debug) == 0)
+      {
+        webapi_imu_debug(nc, hm);
       }
       else
       {

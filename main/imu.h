@@ -3,6 +3,9 @@
 
 #include "common_def.h"
 #include "madgwick.h"
+#include "mahony.h"
+
+#define USE_MADGWICK      1
 
 typedef enum
 {
@@ -74,7 +77,11 @@ typedef struct
 
   imu_data_t                data;
 
+#if USE_MADGWICK == 1
   madgwick_t                filter;
+#else
+  mahony_t                  filter;
+#endif
   float                     update_rate;
 } imu_t;
 

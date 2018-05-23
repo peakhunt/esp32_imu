@@ -356,6 +356,7 @@ cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
 
   cli_printf(intf, "T RAW      : %d"CLI_EOL, raw.temp);
   cli_printf(intf, "Temp       : %-5.2f Celcius"CLI_EOL, data.temp);
+  cli_printf(intf, "Loop Count : %u"CLI_EOL, imu_task_get_loop_cnt());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

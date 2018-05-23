@@ -15,7 +15,7 @@ madgwick_init(madgwick_t* madgwick, float sample_freq)
 
   madgwick->invSampleFreq = 1.0f/sample_freq;
 
-  madgwick->beta  = 1.0f;
+  madgwick->beta  = 0.5f;
 
   madgwick->q0    = 1.0f;
   madgwick->q1    = 0.0f;
