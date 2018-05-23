@@ -75,8 +75,9 @@
          y = -y
          z =  z
 
-  Finally NEU setup. Madgwick expects NEU not NED!
+  Finally NEU setup. Madgwick expects NEU!
               
+              North
                 /\
                 |   +x
                 |
@@ -86,9 +87,9 @@
              ----------
                 top
                                          +y
-                         ----------------->
+                         -----------------> East
 
-                D(Z+)
+                U(Z+)
              ----------
 
 
@@ -223,7 +224,18 @@ imu_update_normal(imu_t* imu)
   //    If your roll/pitch/raw values are strange, suspect this.
   //
 #if USE_MADGWICK == 1
-  // NED
+  //
+  // NED or NEU or whatever
+  //
+  // I want TTGO mark to be north
+  //
+  // So
+  // north(x) = x
+  // east(y)  = y
+  // D(or U)  = z
+  // read comments in the beginning if you are not sure.
+  // this is still confusing to me
+  //
   madgwick_update(&imu->filter,
       imu->data.gyro[1],  imu->data.gyro[0],   imu->data.gyro[2],
       imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
@@ -234,9 +246,9 @@ imu_update_normal(imu_t* imu)
       imu->cal.mag_declination);
 #else
   mahony_update(&imu->filter,
-      imu->data.gyro[1],  imu->data.gyro[0],  -imu->data.gyro[2],
-      imu->data.accel[1], imu->data.accel[0], -imu->data.accel[2],
-      imu->data.mag[1],   imu->data.mag[0],   -imu->data.mag[2]);
+      imu->data.gyro[1],  imu->data.gyro[0],   imu->data.gyro[2],
+      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
+      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
 
   mahony_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,
