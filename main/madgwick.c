@@ -97,14 +97,6 @@ madgwick_update(madgwick_t* madgwick,
 		_4bx = 2.0f * _2bx;
 		_4bz = 2.0f * _2bz;
 
-		// Reference direction of Earth's magnetic field
-		hx = mx * q0q0 - _2q0my * Q3 + _2q0mz * Q2 + mx * q1q1 + _2q1 * my * Q2 + _2q1 * mz * Q3 - mx * q2q2 - mx * q3q3;
-		hy = _2q0mx * Q3 + my * q0q0 - _2q0mz * Q1 + _2q1mx * Q2 - my * q1q1 + my * q2q2 + _2q2 * mz * Q3 - my * q3q3;
-		_2bx = sqrt(hx * hx + hy * hy);
-		_2bz = -_2q0mx * Q2 + _2q0my * Q1 + mz * q0q0 + _2q1mx * Q3 - mz * q1q1 + _2q2 * my * Q3 - mz * q2q2 + mz * q3q3;
-		_4bx = 2.0f * _2bx;
-		_4bz = 2.0f * _2bz;
-
 		// Gradient decent algorithm corrective step
 		s0 = -_2q2 * (2.0f * q1q3 - _2q0q2 - ax) + _2q1 * (2.0f * q0q1 + _2q2q3 - ay) - _2bz * Q2 * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (-_2bx * Q3 + _2bz * Q1) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + _2bx * Q2 * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
 		s1 = _2q3 * (2.0f * q1q3 - _2q0q2 - ax) + _2q0 * (2.0f * q0q1 + _2q2q3 - ay) - 4.0f * Q1 * (1 - 2.0f * q1q1 - 2.0f * q2q2 - az) + _2bz * Q3 * (_2bx * (0.5f - q2q2 - q3q3) + _2bz * (q1q3 - q0q2) - mx) + (_2bx * Q2 + _2bz * Q0) * (_2bx * (q1q2 - q0q3) + _2bz * (q0q1 + q2q3) - my) + (_2bx * Q3 - _4bz * Q1) * (_2bx * (q0q2 + q1q3) + _2bz * (0.5f - q1q1 - q2q2) - mz);
