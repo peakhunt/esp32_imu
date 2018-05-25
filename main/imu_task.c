@@ -24,6 +24,7 @@ const static char* TAG = "imu_task";
 typedef enum
 {
   imu_task_perform_mag_calibration,
+  imu_task_perform_gyro_calibration,
 } imu_task_command_t;
 
 static SemaphoreHandle_t          _mutex;
@@ -55,6 +56,11 @@ imu_task(void* pvParameters)
         gettimeofday(&cal_start_time, NULL);
         imu_start_mag_calibration(&_imu);
         break;
+
+      case imu_task_perform_gyro_calibration:
+        gettimeofday(&cal_start_time, NULL);
+        imu_start_gyro_calibration(&_imu);
+        break;
       }
     }
 
@@ -63,19 +69,27 @@ imu_task(void* pvParameters)
     mpu9250_read_all(&_mpu9250, &_imu.raw);
     imu_update(&_imu);
 
-    switch(_imu.mode)
+    if(_imu.mode != imu_mode_normal)
     {
-    case imu_mode_mag_calibrating:
       gettimeofday(&now, NULL);
-
-      if((now.tv_sec - cal_start_time.tv_sec) >= 30)
+      
+      switch(_imu.mode)
       {
-        imu_finish_mag_calibration(&_imu);
-      }
-      break;
+      case imu_mode_mag_calibrating:
+        if((now.tv_sec - cal_start_time.tv_sec) >= 30)
+        {
+          imu_finish_mag_calibration(&_imu);
+        }
+        break;
 
-    default:
-      break;
+      case imu_mode_gyro_calibrating:
+        if((now.tv_sec - cal_start_time.tv_sec) >= 30)
+        {
+          imu_finish_gyro_calibration(&_imu);
+        }
+      default:
+        break;
+      }
     }
     xSemaphoreGive(_mutex);
     _loop_cnt++;
