@@ -3,6 +3,7 @@
 #include "imu.h"
 #include "imu_mag_calibration.h"
 #include "imu_gyro_calibration.h"
+#include "imu_accel_calibration.h"
 
 /*
    board orientation (not flipped)
@@ -302,6 +303,7 @@ imu_update(imu_t* imu)
     break;
 
   case imu_mode_accel_calibrating:
+    imu_accel_calibration_update(imu->raw.accel[0], imu->raw.accel[1], imu->raw.accel[2]);
     break;
 
   case imu_mode_gyro_calibrating:
@@ -340,4 +342,18 @@ imu_finish_gyro_calibration(imu_t* imu)
 {
   imu->mode = imu_mode_normal;
   imu_gyro_calibration_finish(imu->cal.gyro_off);
+}
+
+void
+imu_start_accel_calibration(imu_t* imu)
+{
+  imu->mode = imu_mode_accel_calibrating;
+  imu_accel_calibration_init();
+}
+
+void
+imu_finish_accel_calibration(imu_t* imu)
+{
+  imu->mode = imu_mode_normal;
+  imu_accel_calibration_finish(imu->cal.accel_off, imu->cal.accel_scale);
 }

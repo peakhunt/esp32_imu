@@ -94,4 +94,7 @@ extern void imu_finish_mag_calibration(imu_t* imu);
 extern void imu_start_gyro_calibration(imu_t* imu);
 extern void imu_finish_gyro_calibration(imu_t* imu);
 
+extern void imu_start_accel_calibration(imu_t* imu);
+extern void imu_finish_accel_calibration(imu_t* imu);
+
 #endif /* !__IMU_DEF_H__ */

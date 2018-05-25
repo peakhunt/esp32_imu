@@ -25,6 +25,7 @@ typedef enum
 {
   imu_task_perform_mag_calibration,
   imu_task_perform_gyro_calibration,
+  imu_task_perform_accel_calibration,
 } imu_task_command_t;
 
 static SemaphoreHandle_t          _mutex;
@@ -61,6 +62,11 @@ imu_task(void* pvParameters)
         gettimeofday(&cal_start_time, NULL);
         imu_start_gyro_calibration(&_imu);
         break;
+
+      case imu_task_perform_accel_calibration:
+        gettimeofday(&cal_start_time, NULL);
+        imu_start_accel_calibration(&_imu);
+        break;
       }
     }
 
@@ -87,6 +93,15 @@ imu_task(void* pvParameters)
         {
           imu_finish_gyro_calibration(&_imu);
         }
+        break;
+
+      case imu_mode_accel_calibrating:
+        if((now.tv_sec - cal_start_time.tv_sec) >= 120)
+        {
+          imu_finish_accel_calibration(&_imu);
+        }
+        break;
+
       default:
         break;
       }

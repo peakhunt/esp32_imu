@@ -91,7 +91,24 @@ print_page2(void)
   else
   {
     st7735_drawstring(0, 0, "Page 2               ", ST7735_WHITE);
-    st7735_drawstring(0, 1, "Calibrating...       ", ST7735_WHITE);
+    switch(mode)
+    {
+    case imu_mode_gyro_calibrating:
+      st7735_drawstring(0, 1, "Calibrating Gyro     ", ST7735_WHITE);
+      break;
+
+    case imu_mode_accel_calibrating:
+      st7735_drawstring(0, 1, "Calibrating Accelero ", ST7735_WHITE);
+      break;
+
+    case imu_mode_mag_calibrating:
+      st7735_drawstring(0, 1, "Calibrating Magneto  ", ST7735_WHITE);
+      break;
+
+    default:
+      st7735_drawstring(0, 1, "BUG................  ", ST7735_WHITE);
+      break;
+    }
     st7735_drawstring(0, 2, "                     ", ST7735_WHITE);
     st7735_drawstring(0, 3, "                     ", ST7735_WHITE);
   }
