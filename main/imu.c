@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "imu.h"
-#include "imu_mag_calibration.h"
-#include "imu_gyro_calibration.h"
-#include "imu_accel_calibration.h"
+#include "mag_calibration.h"
+#include "gyro_calibration.h"
+#include "accel_calibration.h"
 
 /*
    board orientation (not flipped)
@@ -210,6 +210,44 @@ imu_calc_sensor_value(imu_t* imu)
 }
 
 static void
+imu_apply_neu_align(imu_t* imu)
+{
+  //
+  //   
+  // my board sensor setup
+  //
+  //     y
+  //    |
+  //    |
+  //    |------- x
+  //   Z(U)
+
+  //
+  // madgwick/mahony filter expets NEU
+  //
+  //    
+  //     x
+  //    |
+  //    |
+  //    |------- y
+  //   Z(U)
+
+  float temp;
+
+  temp = imu->data.gyro[0];
+  imu->data.gyro[0] = imu->data.gyro[1];
+  imu->data.gyro[1] = temp;
+
+  temp = imu->data.accel[0];
+  imu->data.accel[0] = imu->data.accel[1];
+  imu->data.accel[1] = temp;
+
+  temp = imu->data.mag[0];
+  imu->data.mag[0] = imu->data.mag[1];
+  imu->data.mag[1] = temp;
+}
+
+static void
 imu_update_normal(imu_t* imu)
 {
   imu_apply_calibration(imu);
@@ -217,6 +255,8 @@ imu_update_normal(imu_t* imu)
   imu_apply_board_orientation(imu);
 
   imu_calc_sensor_value(imu);
+
+  imu_apply_neu_align(imu);
 
   //
   // remember
@@ -239,18 +279,18 @@ imu_update_normal(imu_t* imu)
   // this is still confusing to me
   //
   madgwick_update(&imu->filter,
-      imu->data.gyro[1],  imu->data.gyro[0],   imu->data.gyro[2],
-      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
-      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
+      imu->data.gyro[0],  imu->data.gyro[1],   imu->data.gyro[2],
+      imu->data.accel[0], imu->data.accel[1],  imu->data.accel[2],
+      imu->data.mag[0],   imu->data.mag[1],    imu->data.mag[2]);
 
   madgwick_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,
       imu->cal.mag_declination);
 #else
   mahony_update(&imu->filter,
-      imu->data.gyro[1],  imu->data.gyro[0],   imu->data.gyro[2],
-      imu->data.accel[1], imu->data.accel[0],  imu->data.accel[2],
-      imu->data.mag[1],   imu->data.mag[0],    imu->data.mag[2]);
+      imu->data.gyro[0],  imu->data.gyro[1],   imu->data.gyro[2],
+      imu->data.accel[0], imu->data.accel[1],  imu->data.accel[2],
+      imu->data.mag[0],   imu->data.mag[1],    imu->data.mag[2]);
 
   mahony_get_roll_pitch_yaw(&imu->filter,
       imu->data.orientation,
@@ -303,57 +343,68 @@ imu_update(imu_t* imu)
     break;
 
   case imu_mode_accel_calibrating:
-    imu_accel_calibration_update(imu->raw.accel[0], imu->raw.accel[1], imu->raw.accel[2]);
+    accel_calibration_update(imu->raw.accel[0], imu->raw.accel[1], imu->raw.accel[2]);
     break;
 
   case imu_mode_gyro_calibrating:
-    imu_gyro_calibration_update(imu->raw.gyro[0], imu->raw.gyro[1], imu->raw.gyro[2]);
+    gyro_calibration_update(imu->raw.gyro[0], imu->raw.gyro[1], imu->raw.gyro[2]);
     break;
 
   case imu_mode_mag_calibrating:
-    imu_mag_calibration_update(imu->raw.mag[0], imu->raw.mag[1], imu->raw.mag[2]);
+    mag_calibration_update(imu->raw.mag[0], imu->raw.mag[1], imu->raw.mag[2]);
     break;
   }
 }
 
 void
-imu_start_mag_calibration(imu_t* imu)
+imu_mag_calibration_start(imu_t* imu)
 {
   imu->mode = imu_mode_mag_calibrating;
-  imu_mag_calibration_init();
+  mag_calibration_init();
 }
 
 void
-imu_finish_mag_calibration(imu_t* imu)
+imu_mag_calibration_finish(imu_t* imu)
 {
   imu->mode = imu_mode_normal;
-  imu_mag_calibration_finish(imu->cal.mag_bias);
+  mag_calibration_finish(imu->cal.mag_bias);
 }
 
 void
-imu_start_gyro_calibration(imu_t* imu)
+imu_gyro_calibration_start(imu_t* imu)
 {
   imu->mode = imu_mode_gyro_calibrating;
-  imu_gyro_calibration_init();
+  gyro_calibration_init();
 }
 
 void
-imu_finish_gyro_calibration(imu_t* imu)
+imu_gyro_calibration_finish(imu_t* imu)
 {
   imu->mode = imu_mode_normal;
-  imu_gyro_calibration_finish(imu->cal.gyro_off);
+  gyro_calibration_finish(imu->cal.gyro_off);
 }
 
 void
-imu_start_accel_calibration(imu_t* imu)
+imu_accel_calibration_init(imu_t* imu)
+{
+  accel_calibration_init();
+}
+
+void
+imu_accel_calibration_step_start(imu_t* imu)
 {
   imu->mode = imu_mode_accel_calibrating;
-  imu_accel_calibration_init();
 }
 
 void
-imu_finish_accel_calibration(imu_t* imu)
+imu_accel_calibration_step_stop(imu_t* imu)
 {
   imu->mode = imu_mode_normal;
-  imu_accel_calibration_finish(imu->cal.accel_off, imu->cal.accel_scale);
+}
+
+void
+imu_accel_calibration_finish(imu_t* imu)
+{
+  imu->mode = imu_mode_normal;
+  accel_calibration_finish(imu->cal.accel_off, imu->cal.accel_scale);
 }

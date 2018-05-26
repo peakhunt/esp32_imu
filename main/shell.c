@@ -31,6 +31,7 @@ static void cli_command_nvs(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_restart(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_wifi(cli_intf_t* intf, int argc, const char** argv);
 static void cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv);
+static void cli_command_cal(cli_intf_t* intf, int argc, const char** argv);
 
 static const char* TAG   = "shell";
 
@@ -73,6 +74,11 @@ static cli_command_t    _app_commands[] =
     "imu_data",
     "show IMU data",
     cli_command_imu_data,
+  },
+  {
+    "cal",
+    "calibrate sensors",
+    cli_command_cal,
   }
 };
 
@@ -358,6 +364,77 @@ cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
   cli_printf(intf, "T RAW      : %d"CLI_EOL, raw.temp);
   cli_printf(intf, "Temp       : %-5.2f Celcius"CLI_EOL, data.temp);
   cli_printf(intf, "Loop Count : %u"CLI_EOL, imu_task_get_loop_cnt());
+}
+
+static void
+cli_command_cal(cli_intf_t* intf, int argc, const char** argv)
+{
+  if(argc < 2) goto command_err;
+
+  if(strcmp(argv[1], "gyro") == 0)
+  {
+    imu_task_do_gyro_calibration();
+  }
+  else if(strcmp(argv[1], "mag") == 0)
+  {
+    imu_task_do_mag_calibration();
+  }
+  else if(strcmp(argv[1], "accel") == 0)
+  {
+    if(argc != 3) goto command_err;
+
+    // imu_task_do_accel_calibration();
+    if(strcmp(argv[2], "init") == 0)
+    {
+      imu_task_do_accel_calibration_init();
+    }
+    else if(strcmp(argv[2], "step") == 0)
+    {
+      imu_task_do_accel_calibration_start();
+    }
+    else if(strcmp(argv[2], "finish") == 0)
+    {
+      imu_task_do_accel_calibration_finish();
+    }
+    else
+    {
+      goto command_err;
+    }
+  }
+  else if(strcmp(argv[1], "state") == 0)
+  {
+    imu_sensor_calib_data_t   cal;
+
+    imu_task_get_cal_state(&cal);
+
+    cli_printf(intf, "accel offset: %d, %d, %d"CLI_EOL,
+        cal.accel_off[0],
+        cal.accel_off[1],
+        cal.accel_off[2]);
+    cli_printf(intf, "accel scale : %d, %d, %d"CLI_EOL,
+        cal.accel_scale[0],
+        cal.accel_scale[1],
+        cal.accel_scale[2]);
+    cli_printf(intf, "gyro offset : %d, %d, %d"CLI_EOL,
+        cal.gyro_off[0],
+        cal.gyro_off[1],
+        cal.gyro_off[2]);
+    cli_printf(intf, "mag bias    : %d, %d, %d"CLI_EOL,
+        cal.mag_bias[0],
+        cal.mag_bias[1],
+        cal.mag_bias[2]);
+    cli_printf(intf, "mag decl    : %.2f"CLI_EOL, cal.mag_declination);
+  }
+  else
+  {
+    goto command_err;
+  }
+  return;
+
+command_err:
+  cli_printf(intf, "command error"CLI_EOL);
+  cli_printf(intf, "cal gyro|mag|state"CLI_EOL);
+  cli_printf(intf, "cal accel init|step|finish"CLI_EOL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

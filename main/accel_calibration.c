@@ -1,5 +1,5 @@
 #include <math.h>
-#include "imu_accel_calibration.h"
+#include "accel_calibration.h"
 #include "sensor_calib.h"
 
 /*
@@ -14,7 +14,6 @@ static int32_t              _sample_count[6];
 static int32_t              _acc_sum[6][3];
 static int32_t              _offset[3];
 static int32_t              _gain[3];
-static int32_t              _current_axis_ndx;
 
 static sensor_calib_t       _cal_state;
 
@@ -45,7 +44,7 @@ getPrimaryAxisIndex(int32_t sample[3])
 }
 
 void
-imu_accel_calibration_init(void)
+accel_calibration_init(void)
 {
   for(int i = 0; i < 6; i++)
   {
@@ -60,7 +59,7 @@ imu_accel_calibration_init(void)
 }
 
 void
-imu_accel_calibration_update(int16_t ax, int16_t ay, int16_t az)
+accel_calibration_update(int16_t ax, int16_t ay, int16_t az)
 {
   int32_t   accel_value[3];
   int       axis_ndx;
@@ -71,21 +70,10 @@ imu_accel_calibration_update(int16_t ax, int16_t ay, int16_t az)
 
   axis_ndx = getPrimaryAxisIndex(accel_value);
 
-  if (axis_ndx < 0 || (_current_axis_ndx != -1 && axis_ndx != _current_axis_ndx))
+  if (axis_ndx < 0)
   {
     return;
   }
-
-  if(_current_axis_ndx == -1)
-  {
-    _acc_sum[axis_ndx][0] = 0;
-    _acc_sum[axis_ndx][1] = 0;
-    _acc_sum[axis_ndx][2] = 0;
-
-    _sample_count[axis_ndx] = 0;
-  }
-
-  _current_axis_ndx = axis_ndx;
 
   sensorCalibrationPushSampleForOffsetCalculation(&_cal_state, accel_value);
 
@@ -97,7 +85,7 @@ imu_accel_calibration_update(int16_t ax, int16_t ay, int16_t az)
 }
 
 void
-imu_accel_calibration_finish(int16_t offsets[3], int16_t gains[3])
+accel_calibration_finish(int16_t offsets[3], int16_t gains[3])
 {
   float   tmp[3];
   int32_t sample[3];

@@ -25,7 +25,9 @@ typedef enum
 {
   imu_task_perform_mag_calibration,
   imu_task_perform_gyro_calibration,
-  imu_task_perform_accel_calibration,
+  imu_task_perform_accel_calibration_init,
+  imu_task_perform_accel_calibration_step,
+  imu_task_perform_accel_calibration_finish,
 } imu_task_command_t;
 
 static SemaphoreHandle_t          _mutex;
@@ -55,17 +57,28 @@ imu_task(void* pvParameters)
       {
       case imu_task_perform_mag_calibration:
         gettimeofday(&cal_start_time, NULL);
-        imu_start_mag_calibration(&_imu);
+        imu_mag_calibration_start(&_imu);
         break;
 
       case imu_task_perform_gyro_calibration:
         gettimeofday(&cal_start_time, NULL);
-        imu_start_gyro_calibration(&_imu);
+        imu_gyro_calibration_start(&_imu);
         break;
 
-      case imu_task_perform_accel_calibration:
+      case imu_task_perform_accel_calibration_init:
+        imu_accel_calibration_init(&_imu);
+        break;
+
+      case imu_task_perform_accel_calibration_step:
         gettimeofday(&cal_start_time, NULL);
-        imu_start_accel_calibration(&_imu);
+        imu_accel_calibration_step_start(&_imu);
+        break;
+
+      case imu_task_perform_accel_calibration_finish:
+        imu_accel_calibration_finish(&_imu);
+        break;
+
+      default:
         break;
       }
     }
@@ -84,21 +97,21 @@ imu_task(void* pvParameters)
       case imu_mode_mag_calibrating:
         if((now.tv_sec - cal_start_time.tv_sec) >= 30)
         {
-          imu_finish_mag_calibration(&_imu);
+          imu_mag_calibration_finish(&_imu);
         }
         break;
 
       case imu_mode_gyro_calibrating:
         if((now.tv_sec - cal_start_time.tv_sec) >= 30)
         {
-          imu_finish_gyro_calibration(&_imu);
+          imu_gyro_calibration_finish(&_imu);
         }
         break;
 
       case imu_mode_accel_calibrating:
-        if((now.tv_sec - cal_start_time.tv_sec) >= 120)
+        if((now.tv_sec - cal_start_time.tv_sec) >= 20)
         {
-          imu_finish_accel_calibration(&_imu);
+          imu_accel_calibration_step_stop(&_imu);
         }
         break;
 
@@ -137,6 +150,16 @@ imu_task_get_raw_and_data(imu_mode_t* mode, imu_sensor_data_t* raw, imu_data_t* 
   xSemaphoreGive(_mutex);
 }
 
+void
+imu_task_get_cal_state(imu_sensor_calib_data_t* cal)
+{
+  xSemaphoreTake(_mutex, portMAX_DELAY);
+
+  memcpy(cal, &_imu.cal, sizeof(imu_sensor_calib_data_t));
+
+  xSemaphoreGive(_mutex);
+}
+
 uint32_t
 imu_task_get_loop_cnt(void)
 {
@@ -147,5 +170,38 @@ void
 imu_task_do_mag_calibration(void)
 {
   imu_task_command_t  cmd = imu_task_perform_mag_calibration;
+
+  xQueueSend(_cmd_queue, &cmd, 1000 / portTICK_PERIOD_MS);
+}
+
+void
+imu_task_do_gyro_calibration(void)
+{
+  imu_task_command_t  cmd = imu_task_perform_gyro_calibration;
+
+  xQueueSend(_cmd_queue, &cmd, 1000 / portTICK_PERIOD_MS);
+}
+
+void
+imu_task_do_accel_calibration_init(void)
+{
+  imu_task_command_t  cmd = imu_task_perform_accel_calibration_init;
+
+  xQueueSend(_cmd_queue, &cmd, 1000 / portTICK_PERIOD_MS);
+}
+
+void
+imu_task_do_accel_calibration_start(void)
+{
+  imu_task_command_t  cmd = imu_task_perform_accel_calibration_step;
+
+  xQueueSend(_cmd_queue, &cmd, 1000 / portTICK_PERIOD_MS);
+}
+
+void
+imu_task_do_accel_calibration_finish(void)
+{
+  imu_task_command_t  cmd = imu_task_perform_accel_calibration_finish;
+
   xQueueSend(_cmd_queue, &cmd, 1000 / portTICK_PERIOD_MS);
 }

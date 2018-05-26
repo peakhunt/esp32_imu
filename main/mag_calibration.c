@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "imu_mag_calibration.h"
+#include "mag_calibration.h"
 #include "sensor_calib.h"
 
 static int32_t          _mag_prev[3];
@@ -9,7 +9,7 @@ static int16_t          _mag_offset[3];
 static sensor_calib_t   _cal_state;
 
 void
-imu_mag_calibration_init(void)
+mag_calibration_init(void)
 {
   _mag_prev[0] = 
   _mag_prev[1] = 
@@ -19,7 +19,7 @@ imu_mag_calibration_init(void)
 }
 
 void
-imu_mag_calibration_update(int16_t mx, int16_t my, int16_t mz)
+mag_calibration_update(int16_t mx, int16_t my, int16_t mz)
 {
   float     diffMag = 0;
   float     avgMag = 0;
@@ -45,7 +45,7 @@ imu_mag_calibration_update(int16_t mx, int16_t my, int16_t mz)
 }
 
 void
-imu_mag_calibration_finish(int16_t offsets[3])
+mag_calibration_finish(int16_t offsets[3])
 {
   float magZerof[3];
 

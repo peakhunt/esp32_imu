@@ -88,13 +88,15 @@ typedef struct
 extern void imu_init(imu_t* imu);
 extern void imu_update(imu_t* imu);
 
-extern void imu_start_mag_calibration(imu_t* imu);
-extern void imu_finish_mag_calibration(imu_t* imu);
+extern void imu_mag_calibration_start(imu_t* imu);
+extern void imu_mag_calibration_finish(imu_t* imu);
 
-extern void imu_start_gyro_calibration(imu_t* imu);
-extern void imu_finish_gyro_calibration(imu_t* imu);
+extern void imu_gyro_calibration_start(imu_t* imu);
+extern void imu_gyro_calibration_finish(imu_t* imu);
 
-extern void imu_start_accel_calibration(imu_t* imu);
-extern void imu_finish_accel_calibration(imu_t* imu);
+extern void imu_accel_calibration_init(imu_t* imu);
+extern void imu_accel_calibration_step_start(imu_t* imu);
+extern void imu_accel_calibration_step_stop(imu_t* imu);
+extern void imu_accel_calibration_finish(imu_t* imu);
 
 #endif /* !__IMU_DEF_H__ */
