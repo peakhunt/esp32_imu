@@ -37,6 +37,119 @@ static volatile uint32_t          _loop_cnt = 0;
 static xQueueHandle _cmd_queue = NULL;
 
 static void
+imu_task_load_calibration(void)
+{
+  esp_err_t   err;
+  nvs_handle  nvs_handle;
+  static const imu_sensor_calib_data_t    cal_default = 
+  {
+    .accel_off  = { 0, 0, 0},
+    .accel_scale = { 4096, 4096, 4096 },
+    .gyro_off = {0, 0, 0},
+    .mag_bias = {0, 0, 0},
+    .mag_declination = 0.0f
+  };
+
+  err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+  if(err != ESP_OK)
+  {
+    memcpy(&_imu.cal, &cal_default, sizeof(imu_sensor_calib_data_t));
+    ESP_LOGI(TAG, "nvs_open failed. going with all defaults");
+    return;
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_off_x", &_imu.cal.accel_off[0]) != ESP_OK)
+  {
+    _imu.cal.accel_off[0] = cal_default.accel_off[0];
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_off_y", &_imu.cal.accel_off[1]) != ESP_OK)
+  {
+    _imu.cal.accel_off[1] = cal_default.accel_off[1];
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_off_z", &_imu.cal.accel_off[2]) != ESP_OK)
+  {
+    _imu.cal.accel_off[2] = cal_default.accel_off[2];
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_scale_x", &_imu.cal.accel_scale[0]) != ESP_OK)
+  {
+    _imu.cal.accel_scale[0] = cal_default.accel_scale[0];
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_scale_y", &_imu.cal.accel_scale[1]) != ESP_OK)
+  {
+    _imu.cal.accel_scale[1] = cal_default.accel_scale[1];
+  }
+
+  if(nvs_get_i16(nvs_handle, "accel_scale_z", &_imu.cal.accel_scale[2]) != ESP_OK)
+  {
+    _imu.cal.accel_scale[2] = cal_default.accel_scale[2];
+  }
+
+  if(nvs_get_i16(nvs_handle, "gyro_off_x", &_imu.cal.gyro_off[0]) != ESP_OK)
+  {
+    _imu.cal.gyro_off[0] = cal_default.gyro_off[0];
+  }
+
+  if(nvs_get_i16(nvs_handle, "gyro_off_y", &_imu.cal.gyro_off[1]) != ESP_OK)
+  {
+    _imu.cal.gyro_off[1] = cal_default.gyro_off[1];
+  }
+
+  if(nvs_get_i16(nvs_handle, "gyro_off_z", &_imu.cal.gyro_off[2]) != ESP_OK)
+  {
+    _imu.cal.gyro_off[2] = cal_default.gyro_off[2];
+  }
+
+  if(nvs_get_i16(nvs_handle, "mag_bias_x", &_imu.cal.mag_bias[0]) != ESP_OK)
+  {
+    _imu.cal.mag_bias[0] = cal_default.mag_bias[0];
+  }
+
+  if(nvs_get_i16(nvs_handle, "mag_bias_y", &_imu.cal.mag_bias[1]) != ESP_OK)
+  {
+    _imu.cal.mag_bias[1] = cal_default.mag_bias[1];
+  }
+
+  if(nvs_get_i16(nvs_handle, "mag_bias_z", &_imu.cal.mag_bias[2]) != ESP_OK)
+  {
+    _imu.cal.mag_bias[2] = cal_default.mag_bias[2];
+  }
+
+  nvs_close(nvs_handle);
+}
+
+static void
+imu_task_save_calibration(void)
+{
+  esp_err_t   err;
+  nvs_handle  nvs_handle;
+  err = nvs_open("storage", NVS_READWRITE, &nvs_handle);
+  if(err != ESP_OK)
+  {
+    ESP_LOGE(TAG, "nvs_open failed. saving calibration data failed");
+  }
+
+  nvs_set_i16(nvs_handle, "accel_off_x", _imu.cal.accel_off[0]);
+  nvs_set_i16(nvs_handle, "accel_off_y", _imu.cal.accel_off[1]);
+  nvs_set_i16(nvs_handle, "accel_off_z", _imu.cal.accel_off[2]);
+  nvs_set_i16(nvs_handle, "accel_scale_x", _imu.cal.accel_scale[0]);
+  nvs_set_i16(nvs_handle, "accel_scale_y", _imu.cal.accel_scale[1]);
+  nvs_set_i16(nvs_handle, "accel_scale_z", _imu.cal.accel_scale[2]);
+  nvs_set_i16(nvs_handle, "gyro_off_x", _imu.cal.gyro_off[0]);
+  nvs_set_i16(nvs_handle, "gyro_off_y", _imu.cal.gyro_off[1]);
+  nvs_set_i16(nvs_handle, "gyro_off_z", _imu.cal.gyro_off[2]);
+  nvs_set_i16(nvs_handle, "mag_bias_x", _imu.cal.mag_bias[0]);
+  nvs_set_i16(nvs_handle, "mag_bias_y", _imu.cal.mag_bias[1]);
+  nvs_set_i16(nvs_handle, "mag_bias_z", _imu.cal.mag_bias[2]);
+
+  nvs_commit(nvs_handle);
+  nvs_close(nvs_handle);
+}
+
+static void
 imu_task(void* pvParameters)
 {
   const TickType_t xDelay = IMU_POLL_INTERVAL / portTICK_PERIOD_MS;
@@ -76,6 +189,7 @@ imu_task(void* pvParameters)
 
       case imu_task_perform_accel_calibration_finish:
         imu_accel_calibration_finish(&_imu);
+        imu_task_save_calibration();
         break;
 
       default:
@@ -98,6 +212,7 @@ imu_task(void* pvParameters)
         if((now.tv_sec - cal_start_time.tv_sec) >= 30)
         {
           imu_mag_calibration_finish(&_imu);
+          imu_task_save_calibration();
         }
         break;
 
@@ -105,6 +220,7 @@ imu_task(void* pvParameters)
         if((now.tv_sec - cal_start_time.tv_sec) >= 30)
         {
           imu_gyro_calibration_finish(&_imu);
+          imu_task_save_calibration();
         }
         break;
 
@@ -130,6 +246,7 @@ imu_task_init(void)
   ESP_LOGI(TAG, "initialing IMU task");
 
   imu_init(&_imu);
+  imu_task_load_calibration();
 
   _mutex = xSemaphoreCreateMutex();
 
