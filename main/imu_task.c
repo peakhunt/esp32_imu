@@ -17,7 +17,7 @@
 
 #include "sdkconfig.h"
 
-#define IMU_POLL_INTERVAL               5
+#define IMU_POLL_INTERVAL               2
 
 const static char* TAG = "imu_task";
 
@@ -160,7 +160,7 @@ imu_task(void* pvParameters)
   ESP_LOGI(TAG, "starting imu task");
 
 
-  mpu9250_init(&_mpu9250, MPU9250_Accelerometer_8G, MPU9250_Gyroscope_500s, &_imu.lsb);
+  mpu9250_init(&_mpu9250, MPU9250_Accelerometer_8G, MPU9250_Gyroscope_1000s, &_imu.lsb);
 
   while(1)
   {

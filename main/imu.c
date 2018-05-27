@@ -107,6 +107,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 static inline void
+swap_f(float* a, float* b)
+{
+  float tmp;
+
+  tmp = *a;
+  *a = *b;
+  *b = tmp;
+}
+
+static inline void
 alignReading(int16_t* values, imu_board_align_t align)
 {
   const int16_t   x = values[0],
@@ -168,15 +178,9 @@ alignReading(int16_t* values, imu_board_align_t align)
 static void
 imu_apply_calibration(imu_t* imu)
 {
-#if 1
   imu->adjusted.accel[0] = (imu->raw.accel[0] - imu->cal.accel_off[0]) * imu->cal.accel_scale[0] / 4096;
   imu->adjusted.accel[1] = (imu->raw.accel[1] - imu->cal.accel_off[1]) * imu->cal.accel_scale[1] / 4096;
   imu->adjusted.accel[2] = (imu->raw.accel[2] - imu->cal.accel_off[2]) * imu->cal.accel_scale[2] / 4096;
-#else
-  imu->adjusted.accel[0] = (imu->raw.accel[0] - imu->cal.accel_off[0]) * imu->cal.accel_scale[0] / 4096.0f;
-  imu->adjusted.accel[1] = (imu->raw.accel[1] - imu->cal.accel_off[1]) * imu->cal.accel_scale[1] / 4096.0f;
-  imu->adjusted.accel[2] = (imu->raw.accel[2] - imu->cal.accel_off[2]) * imu->cal.accel_scale[2] / 4096.0f;
-#endif
 
   imu->adjusted.gyro[0] = (imu->raw.gyro[0] - imu->cal.gyro_off[0]);
   imu->adjusted.gyro[1] = (imu->raw.gyro[1] - imu->cal.gyro_off[1]);
@@ -236,21 +240,19 @@ imu_apply_neu_align(imu_t* imu)
   //    |
   //    |
   //    |------- y
-  //   Z(U)
 
-  float temp;
+  // FIXME
+  // looks like all gyro directions should be reversed too!!!
+  // why???
+  //
+  swap_f(&imu->data.gyro[0], &imu->data.gyro[1]);
+  imu->data.gyro[2] = -imu->data.gyro[2];
+  imu->data.gyro[0] = -imu->data.gyro[0];
+  imu->data.gyro[1] = -imu->data.gyro[1];
 
-  temp = imu->data.gyro[0];
-  imu->data.gyro[0] = imu->data.gyro[1];
-  imu->data.gyro[1] = temp;
+  swap_f(&imu->data.accel[0], &imu->data.accel[1]);
 
-  temp = imu->data.accel[0];
-  imu->data.accel[0] = imu->data.accel[1];
-  imu->data.accel[1] = temp;
-
-  temp = imu->data.mag[0];
-  imu->data.mag[0] = imu->data.mag[1];
-  imu->data.mag[1] = temp;
+  swap_f(&imu->data.mag[0], &imu->data.mag[1]);
 }
 
 static void
@@ -328,7 +330,7 @@ imu_init(imu_t* imu)
   imu->gyro_align   = imu_board_align_cw_270_flip;
   imu->mag_align    = imu_board_align_cw_180;
 
-  imu->update_rate  = 200;
+  imu->update_rate  = 500;
 
 #if USE_MADGWICK == 1
   madgwick_init(&imu->filter, imu->update_rate);

@@ -124,7 +124,7 @@ static  void
 lcd_driver_task(void *pvParameter)
 {
   uint32_t pin_num,
-           page_num = 1;
+           page_num = 2;
 
   st7735_initr(INITR_144GREENTAB);
   st7735_fillscreen(ST7735_BLACK);
