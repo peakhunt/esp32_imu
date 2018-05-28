@@ -56,12 +56,14 @@
     }
   },
   "dependencies": {
-    "vue": "^2.4.2",
     "axios": "^0.16.1",
+    "chart.js": "^2.7.2",
+    "vue": "^2.4.2",
+    "vue-chartjs": "^3.3.1",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.5.3",
-    "vuex": "^2.3.1",
-    "vuetify": "1.0.0"
+    "vuetify": "1.0.0",
+    "vuex": "^2.3.1"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
