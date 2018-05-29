@@ -66,7 +66,7 @@
 
       <v-footer :fixed="fixed" app>
         <v-spacer></v-spacer>
-        <span>&copy; 2017</span>
+        <span>&copy; 김복돌 2018</span>
       </v-footer>
 
       <connect-dialog :showDialog="showConnectDialog" @connect="onConnectPressed" @dismiss="onDismissPressed"></connect-dialog>
