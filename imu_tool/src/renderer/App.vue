@@ -48,8 +48,11 @@
         <v-toolbar-title v-text="title"></v-toolbar-title>
         <v-spacer></v-spacer>
 
-        <v-btn icon @click="showConnectDialog = true">
+        <v-btn v-if="isStopped === true" icon @click="showConnectDialog = true">
           <v-icon>play_arrow</v-icon>
+        </v-btn>
+        <v-btn v-if="isStopped === false" icon @click="onStopPressed">
+          <v-icon>stop</v-icon>
         </v-btn>
       </v-toolbar>
 
@@ -66,7 +69,7 @@
         <span>&copy; 2017</span>
       </v-footer>
 
-      <connect-dialog :showDialog="showConnectDialog"></connect-dialog>
+      <connect-dialog :showDialog="showConnectDialog" @connect="onConnectPressed" @dismiss="onDismissPressed"></connect-dialog>
     </v-app>
   </div>
 </template>
@@ -77,19 +80,58 @@
   export default {
     name: 'imu_tool',
     components: { ConnectDialog },
+    methods: {
+      getIMUData (server) {
+        var url = 'http://' + server.ipAddress + ':' + server.port + '/imu/orientation'
+
+        console.log('requesting ' + url)
+        this.$http.get(url)
+          .then((response) => {
+            console.log('got data')
+            if (this.isStopped === true) {
+              return
+            }
+            this.$emit('imuOrientation', response.data)
+            this.timer = setTimeout(() => {
+              this.getIMUData(server)
+            }, server.wait)
+          }, (err) => {
+            console.log('failed to retrieve:' + err)
+            this.isStopped = true
+          })
+      },
+      onConnectPressed (info) {
+        this.showConnectDialog = false
+        this.isStopped = false
+        this.getIMUData(info)
+      },
+      onDismissPressed () {
+        this.showConnectDialog = false
+      },
+      onStopPressed () {
+        this.isStopped = true
+        if (this.timer != null) {
+          clearTimeout(this.timer)
+          this.timer = null
+        }
+      }
+    },
     data: () => ({
       clipped: false,
       drawer: true,
       fixed: false,
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
-        { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' }
+        { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
+        { icon: 'bubble_chart', title: 'IMU Graph', to: '/imu-graph' }
       ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
       title: 'IMU Tool',
-      showConnectDialog: false
+      showConnectDialog: false,
+      isStopped: true,
+      timer: null
     })
   }
 </script>

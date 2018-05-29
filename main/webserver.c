@@ -116,9 +116,18 @@ webapi_imu_orientation(struct mg_connection* nc, struct http_message* hm)
       "Transfer-Encoding: chunked\r\n\r\n");
 
   mg_printf_http_chunk(nc, "{\"data\": {");
-  mg_printf_http_chunk(nc, "roll: %.2f, ", data.orientation[0]);
-  mg_printf_http_chunk(nc, "pitch: %.2f, ", data.orientation[1]);
-  mg_printf_http_chunk(nc, "yaw: %.2f", data.orientation[2]);
+  mg_printf_http_chunk(nc, "\"roll\": %.2f, ", data.orientation[0]);
+  mg_printf_http_chunk(nc, "\"pitch\": %.2f, ", data.orientation[1]);
+  mg_printf_http_chunk(nc, "\"yaw\": %.2f,", data.orientation[2]);
+  mg_printf_http_chunk(nc, "\"ax\": %.2f,", data.accel[0]);
+  mg_printf_http_chunk(nc, "\"ay\": %.2f,", data.accel[1]);
+  mg_printf_http_chunk(nc, "\"az\": %.2f,", data.accel[2]);
+  mg_printf_http_chunk(nc, "\"gx\": %.2f,", data.gyro[0]);
+  mg_printf_http_chunk(nc, "\"gy\": %.2f,", data.gyro[1]);
+  mg_printf_http_chunk(nc, "\"gz\": %.2f,", data.gyro[2]);
+  mg_printf_http_chunk(nc, "\"mx\": %.2f,", data.mag[0]);
+  mg_printf_http_chunk(nc, "\"my\": %.2f,", data.mag[1]);
+  mg_printf_http_chunk(nc, "\"mz\": %.2f", data.mag[2]);
   mg_printf_http_chunk(nc, "}}");
 
   mg_send_http_chunk(nc, "", 0);

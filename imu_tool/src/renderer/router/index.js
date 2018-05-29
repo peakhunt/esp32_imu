@@ -16,6 +16,11 @@ export default new Router({
       component: require('@/components/InspireView').default
     },
     {
+      path: '/imu-graph',
+      name: 'imu-graph',
+      component: require('@/components/IMUGraph').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

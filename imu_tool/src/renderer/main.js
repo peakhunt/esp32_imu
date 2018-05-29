@@ -7,7 +7,13 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+import VDragged from 'v-dragged'
+import vuewheel from 'vuewheel'
+
 Vue.use(Vuetify)
+Vue.use(VDragged)
+Vue.use(vuewheel)
+
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
