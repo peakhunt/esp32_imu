@@ -6,6 +6,13 @@
 
 ## current status
 
+### IMU tool (May/29/2018)
+One picture is worth a thousand words!
+
+![IMU tool](captures/imu_tool.png "IMU tool")
+
+
+
 ### as of May,13,2018
 CLI is implemented. Now you can access ESP32 via telnet.
 
