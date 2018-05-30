@@ -48,6 +48,25 @@
         <v-toolbar-title v-text="title"></v-toolbar-title>
         <v-spacer></v-spacer>
 
+        <v-badge left>
+          <span slot="badge">{{numRequest}}</span>
+          <span>Requests</span>
+        </v-badge>
+        &nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;
+
+        <v-badge left>
+          <span slot="badge">{{numSuccess}}</span>
+          <span>Success</span>
+        </v-badge>
+        &nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;
+
+        <v-badge left>
+          <span slot="badge">{{numFail}}</span>
+          <span>Fails</span>
+        </v-badge>
+
         <v-btn v-if="isStopped === true" icon @click="showConnectDialog = true">
           <v-icon>play_arrow</v-icon>
         </v-btn>
@@ -85,9 +104,14 @@
         var url = 'http://' + server.ipAddress + ':' + server.port + '/imu/orientation'
 
         console.log('requesting ' + url)
+        this.numRequest++
+
         this.$http.get(url)
           .then((response) => {
             console.log('got data')
+
+            this.numSuccess++
+
             if (this.isStopped === true) {
               return
             }
@@ -96,6 +120,7 @@
               this.getIMUData(server)
             }, server.wait)
           }, (err) => {
+            this.numFail++
             console.log('failed to retrieve:' + err)
             this.isStopped = true
           })
@@ -103,12 +128,19 @@
       onConnectPressed (info) {
         this.showConnectDialog = false
         this.isStopped = false
+
+        this.numRequest = 0
+        this.numSuccess = 0
+        this.numFail = 0
+
+        this.$emit('onConnected')
         this.getIMUData(info)
       },
       onDismissPressed () {
         this.showConnectDialog = false
       },
       onStopPressed () {
+        this.$emit('onDisconnected')
         this.isStopped = true
         if (this.timer != null) {
           clearTimeout(this.timer)
@@ -131,7 +163,10 @@
       title: 'IMU Tool',
       showConnectDialog: false,
       isStopped: true,
-      timer: null
+      timer: null,
+      numRequest: 0,
+      numSuccess: 0,
+      numFail: 0
     })
   }
 </script>
