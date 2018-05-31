@@ -116,9 +116,13 @@
               return
             }
             this.$emit('imuOrientation', response.data)
-            this.timer = setTimeout(() => {
+            if (server.wait !== 0) {
+              this.timer = setTimeout(() => {
+                this.getIMUData(server)
+              }, server.wait)
+            } else {
               this.getIMUData(server)
-            }, server.wait)
+            }
           }, (err) => {
             this.numFail++
             console.log('failed to retrieve:' + err)
@@ -155,7 +159,8 @@
       items: [
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
-        { icon: 'bubble_chart', title: 'IMU Graph', to: '/imu-graph' }
+        { icon: 'bubble_chart', title: 'IMU Graph', to: '/imu-graph' },
+        { icon: 'bubble_chart', title: 'IMU Dashboard', to: '/imu-dashboard' }
       ],
       miniVariant: false,
       right: true,

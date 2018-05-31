@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/IMUGraph').default
     },
     {
+      path: '/imu-dashboard',
+      name: 'imu-dashboard',
+      component: require('@/components/IMUDashboard').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

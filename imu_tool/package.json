@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "canvas-gauges": "^2.1.5",
     "chart.js": "^2.7.2",
     "dateformat": "^3.0.3",
     "v-dragged": "0.0.5",
@@ -64,6 +65,7 @@
     "vue-chartjs": "^3.3.1",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.5.3",
+    "vue2-canvas-gauges": "0.0.0",
     "vuetify": "1.0.0",
     "vuewheel": "^2.1.6",
     "vuex": "^2.3.1"
