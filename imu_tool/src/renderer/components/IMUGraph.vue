@@ -152,7 +152,7 @@
       },
       */
       onImuOrientation (o) {
-        console.log('*** onImuOrientation ***')
+        // console.log('*** onImuOrientation ***')
 
         var d = new Date()
         var signals = ['roll', 'pitch', 'yaw', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz']
@@ -192,7 +192,8 @@
 
         self.count++
 
-        if (self.count >= 5) {
+        if (self.count > o.connectInfo.bufferSize) {
+          // console.log(o.connectInfo.bufferSize)
           self.$refs['lineGraph'].refresh()
           self.count = 0
         }

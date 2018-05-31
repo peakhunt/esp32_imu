@@ -6,8 +6,9 @@
       </v-card-title>
       <v-card-text>
         <v-text-field label="IMU IP Address" v-model.string="ipAddress" required></v-text-field>
-        <v-text-field label="IMU IP Address" v-model.number="port" required></v-text-field>
+        <v-text-field label="Port" v-model.number="port" required></v-text-field>
         <v-text-field label="Poll Wait Time" v-model.number="wait" required></v-text-field>
+        <v-text-field label="Buffer Size" v-model.number="bufferSize" required></v-text-field>
       </v-card-text>
 
       <v-card-actions>
@@ -28,7 +29,12 @@
         this.$emit('dismiss')
       },
       connect () {
-        this.$emit('connect', { ipAddress: this.ipAddress, port: this.port, wait: this.wait })
+        this.$emit('connect', {
+          ipAddress: this.ipAddress,
+          port: this.port,
+          wait: this.wait,
+          bufferSize: this.bufferSize
+        })
       },
       isInputOK () {
         if (this.ipAddress != null && this.port != null) {
@@ -48,7 +54,8 @@
       return {
         ipAddress: null,
         port: 80,
-        wait: 10
+        wait: 10,
+        bufferSize: 5
       }
     }
   }

@@ -74,12 +74,14 @@
           <v-icon>stop</v-icon>
         </v-btn>
 
+        <!-- only for simulation
         <v-btn v-if="isStopped === true" icon @click="onSimulStart">
           <v-icon>play_arrow</v-icon>
         </v-btn>
         <v-btn v-if="isStopped === false" icon @click="onSimulStop">
           <v-icon>stop</v-icon>
         </v-btn>
+        -->
 
       </v-toolbar>
 
@@ -135,6 +137,9 @@
               mx: this.getRandom(-2, 2),
               my: this.getRandom(-2, 2),
               mz: this.getRandom(-2, 2)
+            },
+            connectInfo: {
+              bufferSize: 5
             }
           }
           this.$emit('imuOrientation', obj)
@@ -151,19 +156,19 @@
       getIMUData (server) {
         var url = 'http://' + server.ipAddress + ':' + server.port + '/imu/orientation'
 
-        console.log('requesting ' + url)
+        // console.log('requesting ' + url)
         this.numRequest++
 
         this.$http.get(url)
           .then((response) => {
-            console.log('got data')
+            // console.log('got data')
 
             this.numSuccess++
 
             if (this.isStopped === true) {
               return
             }
-            this.$emit('imuOrientation', response.data)
+            this.$emit('imuOrientation', Object.assign(response.data, { connectInfo: server }))
             if (server.wait !== 0) {
               this.timer = setTimeout(() => {
                 this.getIMUData(server)
