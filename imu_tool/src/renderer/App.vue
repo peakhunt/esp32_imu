@@ -73,6 +73,14 @@
         <v-btn v-if="isStopped === false" icon @click="onStopPressed">
           <v-icon>stop</v-icon>
         </v-btn>
+
+        <v-btn v-if="isStopped === true" icon @click="onSimulStart">
+          <v-icon>play_arrow</v-icon>
+        </v-btn>
+        <v-btn v-if="isStopped === false" icon @click="onSimulStop">
+          <v-icon>stop</v-icon>
+        </v-btn>
+
       </v-toolbar>
 
       <v-content>
@@ -100,6 +108,46 @@
     name: 'imu_tool',
     components: { ConnectDialog },
     methods: {
+      getRandom (min, max) {
+        return Math.random() * (max - min) + min
+      },
+      onSimulStart () {
+        this.isStopped = false
+
+        this.numRequest = 0
+        this.numSuccess = 0
+        this.numFail = 0
+
+        this.$emit('onConnected')
+
+        this.simulTimer = setInterval(() => {
+          var obj = {
+            data: {
+              roll: this.getRandom(-180, 180),
+              pitch: this.getRandom(-180, 180),
+              yaw: this.getRandom(0, 360),
+              ax: this.getRandom(-2, 2),
+              ay: this.getRandom(-2, 2),
+              az: this.getRandom(-2, 2),
+              gx: this.getRandom(-2, 2),
+              gy: this.getRandom(-2, 2),
+              gz: this.getRandom(-2, 2),
+              mx: this.getRandom(-2, 2),
+              my: this.getRandom(-2, 2),
+              mz: this.getRandom(-2, 2)
+            }
+          }
+          this.$emit('imuOrientation', obj)
+        }, 10)
+      },
+      onSimulStop () {
+        this.$emit('onDisconnected')
+        this.isStopped = true
+        if (this.simulTimer != null) {
+          clearInterval(this.simulTimer)
+          this.simulTimer = null
+        }
+      },
       getIMUData (server) {
         var url = 'http://' + server.ipAddress + ':' + server.port + '/imu/orientation'
 
@@ -169,6 +217,7 @@
       showConnectDialog: false,
       isStopped: true,
       timer: null,
+      simulTimer: null,
       numRequest: 0,
       numSuccess: 0,
       numFail: 0
