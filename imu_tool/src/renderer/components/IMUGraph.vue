@@ -90,6 +90,7 @@
         })
         this.$refs['lineGraph'].refresh()
       },
+      /*
       onImuOrientation (o) {
         console.log('*** onImuOrientation ***')
 
@@ -148,6 +149,53 @@
         })
 
         this.$refs['lineGraph'].refresh()
+      },
+      */
+      onImuOrientation (o) {
+        console.log('*** onImuOrientation ***')
+
+        var d = new Date()
+        var signals = ['roll', 'pitch', 'yaw', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz']
+        var ndx = 0
+        var self = this
+
+        d = dateFormat(d, 'HH:MM:ss')
+
+        self.data.labels[self.data.labels.length] = d
+        self.data.labels_accumulated[self.data.labels_accumulated.length] = d
+
+        if (self.data.labels.length > self.plotCfg.maxVisible) {
+          self.data.labels.splice(0, 1)
+          if (self.data.labels_accumulated.length <= self.plotCfg.maxKeep) {
+            self.visibleStart += 1
+          }
+        }
+
+        if (self.data.labels_accumulated.length > self.plotCfg.maxKeep) {
+          self.data.labels_accumulated.splice(0, 1)
+        }
+
+        signals.forEach((v) => {
+          self.data.datasets[ndx].data[self.data.datasets[ndx].data.length] = o.data[v]
+
+          self.data.datasets[ndx].data_accumulated[self.data.datasets[ndx].data_accumulated.length] = o.data[v]
+
+          if (self.data.datasets[ndx].data.length > self.plotCfg.maxVisible) {
+            self.data.datasets[ndx].data.splice(0, 1)
+          }
+
+          if (self.data.datasets[ndx].data_accumulated.length > self.plotCfg.maxKeep) {
+            self.data.datasets[ndx].data_accumulated.splice(0, 1)
+          }
+          ndx++
+        })
+
+        self.count++
+
+        if (self.count >= 5) {
+          self.$refs['lineGraph'].refresh()
+          self.count = 0
+        }
       },
       clearData () {
         this.data.labels = []
@@ -223,6 +271,7 @@
           maxKeep: 7200,
           numDataToBuffer: 10
         },
+        count: 0,
         visibleStart: 0,
         data: {
           labels: [],
