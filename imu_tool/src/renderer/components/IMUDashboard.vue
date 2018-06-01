@@ -1,13 +1,12 @@
 <template>
-  <v-container fluid grid-list-md mt-0 fill-height>
+  <v-container grid-list-md text-xs-center>
     <v-layout row wrap>
-      <v-flex xs12>
-        <v-card>
-          <v-card-title>
-            <h2>IMU Dashbord</h2>
-          </v-card-title>
-          <compass :value="value" :width="width" :height="height"> </compass>
-        </v-card>
+      <v-flex xs6>
+        <compass :value="value" :width="width" :height="height"> </compass>
+      </v-flex>
+      
+      <v-flex xs6>
+        <orientation-three :width="width" :height="height"></orientation-three>
       </v-flex>
     </v-layout>
   </v-container>
@@ -16,13 +15,14 @@
 
 <script>
   import Compass from '@/components/Compass'
+  import OrientationThree from '@/components/OrientationThree'
 
   export default {
     name: 'IMUDashboard',
-    components: { Compass },
+    components: { Compass, OrientationThree },
     methods: {
       onImuOrientation (o) {
-        console.log('compass orient: ' + o.data.yaw)
+        // console.log('compass orient: ' + o.data.yaw)
         this.value = o.data.yaw
       }
     },
@@ -35,9 +35,11 @@
     data () {
       return {
         value: 0,
-        width: 300,
-        height: 300
+        width: 400,
+        height: 400
       }
+    },
+    watch: {
     }
   }
 </script>
