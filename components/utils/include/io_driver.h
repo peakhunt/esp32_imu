@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include "common_def.h"
-#include "list.h"
+#include "generic_list.h"
 
 typedef enum
 {

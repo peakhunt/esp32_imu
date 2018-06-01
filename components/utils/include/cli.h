@@ -2,7 +2,7 @@
 #define __CLI_DEF_H__
 
 #include "common_def.h"
-#include "list.h"
+#include "generic_list.h"
 #include "io_driver.h"
 
 #define CLI_COMMAND_MAX_ARGS          32

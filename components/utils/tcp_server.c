@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include "tcp_server.h"
-#include "list.h"
+#include "generic_list.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //

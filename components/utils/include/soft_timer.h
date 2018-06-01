@@ -6,7 +6,7 @@
 #ifndef __SOFT_TIMER_DEF_H__
 #define __SOFT_TIMER_DEF_H__
 
-#include "list.h"
+#include "generic_list.h"
 
 #define SOFT_TIMER_NUM_BUCKETS      8
 

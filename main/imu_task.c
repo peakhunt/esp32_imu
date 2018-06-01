@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <string.h>
-#include "list.h"
+#include "generic_list.h"
 #include "shell.h"
 #include "io_driver.h"
 #include "esp_log.h"

@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <errno.h>
-#include "list.h"
+#include "generic_list.h"
 #include "tcp_server_ipv4.h"
 #include "sock_util.h"
 
