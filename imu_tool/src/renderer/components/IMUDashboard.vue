@@ -1,12 +1,14 @@
 <template>
   <v-container grid-list-md text-xs-center>
-    <v-layout row wrap>
-      <v-flex xs6>
-        <compass :value="value" :width="width" :height="height"> </compass>
+    <v-layout row wrap align-center justify-center>
+      <v-flex xs4>
+        <div :width="400" :height="550">
+          <compass :value="value" :width="350" :height="350"> </compass>
+        </div>
       </v-flex>
       
-      <v-flex xs6>
-        <orientation-three :width="width" :height="height"></orientation-three>
+      <v-flex xs8>
+        <orientation-three :width="550" :height="550"></orientation-three>
       </v-flex>
     </v-layout>
   </v-container>
@@ -35,8 +37,8 @@
     data () {
       return {
         value: 0,
-        width: 400,
-        height: 400
+        width: 500,
+        height: 500
       }
     },
     watch: {
