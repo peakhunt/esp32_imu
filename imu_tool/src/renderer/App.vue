@@ -95,7 +95,7 @@
 
       <v-footer :fixed="fixed" app>
         <v-spacer></v-spacer>
-        <span>&copy; 김복돌 2018</span>
+        <span>&copy; 김 "Hawk 복돌" 혁 <v-icon>insert_emoticon</v-icon>  2018</span>
       </v-footer>
 
       <connect-dialog :showDialog="showConnectDialog" @connect="onConnectPressed" @dismiss="onDismissPressed"></connect-dialog>

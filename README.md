@@ -10,6 +10,7 @@
 One picture is worth a thousand words!
 
 ![IMU tool](captures/imu_tool.png "IMU tool")
+![IMU tool dashboard](captures/imu_tool_dashboard.png.jpg "IMU tool dashboard")
 
 
 

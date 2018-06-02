@@ -8,7 +8,7 @@
       </v-flex>
       
       <v-flex xs8>
-        <orientation-three :width="550" :height="550"></orientation-three>
+        <orientation-three :width="550" :height="550" :orientation="orientation"></orientation-three>
       </v-flex>
     </v-layout>
   </v-container>
@@ -26,6 +26,12 @@
       onImuOrientation (o) {
         // console.log('compass orient: ' + o.data.yaw)
         this.value = o.data.yaw
+
+        this.orientation = {
+          roll: o.data.roll,
+          pitch: o.data.pitch,
+          yaw: o.data.yaw
+        }
       }
     },
     created () {
@@ -38,7 +44,12 @@
       return {
         value: 0,
         width: 500,
-        height: 500
+        height: 500,
+        orientation: {
+          roll: 0,
+          pitch: 0,
+          yaw: 0
+        }
       }
     },
     watch: {

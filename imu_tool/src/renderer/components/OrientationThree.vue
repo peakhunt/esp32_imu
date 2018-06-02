@@ -1,25 +1,66 @@
 <template>
-  <div :width="width" :height="height" ref="threeCanvas">
+  <div :width="width" :height="height" ref="threeCanvas" class="absolute_container">
+    <v-btn fixed @click="set_heading_offset()" style="position: absolute; top: 20px; left: 20px;" color="primary">
+    Reset Heading
+    </v-btn>
   </div>
 </template>
 
 <script>
-  // import THREE from 'three'
   const THREE = require('three')
-  const OrbitControls = require('three-orbit-controls')(THREE)
+  // const OrbitControls = require('three-orbit-controls')(THREE)
 
   export default {
     name: 'OrientationThree',
-    props: ['width', 'height'],
+    props: ['width', 'height', 'orientation'],
     methods: {
       do_render () {
         this.renderer.render(this.scene, this.camera)
         requestAnimationFrame(this.do_render)
+      },
+      set_heading_offset () {
+        this.heading_offset = -this.o.yaw
+
+        console.log('setting heading offset to:' + this.heading_offset)
+
+        this.set_orientation(this.o)
+      },
+      set_orientation (o) {
+        // FIXME. change the code to use quaternion to avoid gimbal lock
+        // from euler angles.
+
+        this.o.roll = o.roll
+        this.o.pitch = o.pitch
+        this.o.yaw = o.yaw + this.heading_offset
+
+        var z = this.o.roll * Math.PI / 180
+        var x = this.o.pitch * Math.PI / 180
+        var y = this.o.yaw * Math.PI / 180
+
+        var rot = new THREE.Euler(-x, -y, z, 'XYZ')
+
+        this.cube.setRotationFromEuler(rot)
+
+        var arrowXDir = new THREE.Vector3(0, 0, -1)
+        var arrowYDir = new THREE.Vector3(1, 0, 0)
+        var arrowZDir = new THREE.Vector3(0, 1, 0)
+
+        arrowXDir.applyEuler(rot)
+        arrowYDir.applyEuler(rot)
+        arrowZDir.applyEuler(rot)
+
+        arrowXDir.normalize()
+        arrowYDir.normalize()
+        arrowZDir.normalize()
+
+        this.arrowX.setDirection(arrowXDir)
+        this.arrowY.setDirection(arrowYDir)
+        this.arrowZ.setDirection(arrowZDir)
       }
     },
     mounted () {
       this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000)
-      this.camera.position.set(0, 4, 4)
+      this.camera.position.set(0, 0, 10)
 
       this.renderer = new THREE.WebGLRenderer({
         alpha: false
@@ -27,6 +68,8 @@
       this.renderer.setSize(this.width, this.height)
       this.$refs.threeCanvas.appendChild(this.renderer.domElement)
       // this.renderer.setClearColor(new THREE.Color(0xffffff, 1.0))
+
+      // FIXME resize handling!
 
       this.scene = new THREE.Scene()
 
@@ -49,15 +92,19 @@
 
       var origin = new THREE.Vector3(0, 0, 0)
 
-      this.arrowX = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), origin, 5, 0xff0000)
-      this.arrowY = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), origin, 3, 0x00ff00)
-      this.arrowZ = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), origin, 2.5, 0x0000ff)
+      var arrowXDir = new THREE.Vector3(0, 0, -1)
+      var arrowYDir = new THREE.Vector3(1, 0, 0)
+      var arrowZDir = new THREE.Vector3(0, 1, 0)
+
+      this.arrowX = new THREE.ArrowHelper(arrowXDir, origin, 5, 0xff0000)
+      this.arrowY = new THREE.ArrowHelper(arrowYDir, origin, 3, 0x00ff00)
+      this.arrowZ = new THREE.ArrowHelper(arrowZDir, origin, 2.5, 0x0000ff)
 
       this.scene.add(this.arrowX)
       this.scene.add(this.arrowY)
       this.scene.add(this.arrowZ)
 
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+      // this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 
       this.do_render()
     },
@@ -74,13 +121,28 @@
         axisHelper: null,
         arrowX: null,
         arrowY: null,
-        arrowZ: null
+        arrowZ: null,
+        heading_offset: 0,
+        o: {
+          roll: 0,
+          pitch: 0,
+          yaw: 0
+        }
       }
     },
     watch: {
+      orientation (no, oo) {
+        this.set_orientation(no)
+      }
     }
   }
 </script>
 
 <style scoped>
+.absolute_container {
+  position: relative;
+  float: left;
+  left: 50%;
+  transform: translateX(-50%);
+}
 </style>
