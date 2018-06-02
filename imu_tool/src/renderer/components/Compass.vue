@@ -1,5 +1,5 @@
 <template>
-  <radial-gauge :value="value" :options="options"></radial-gauge>
+  <radial-gauge :value="heading" :options="options"></radial-gauge>
 </template>
 
 <script>
@@ -11,8 +11,15 @@
       RadialGauge
     },
     props: ['value', 'width', 'height'],
+    beforeDestroy () {
+      if (this.timer != null) {
+        clearTimeout(this.timer)
+      }
+    },
     data () {
       return {
+        heading: 0,
+        timer: null,
         options: {
           width: this.width,
           height: this.height,
@@ -40,7 +47,7 @@
           colorNumbers: '#ccc',
           colorNeedle: 'rgba(240, 128, 128, 1)',
           colorNeedleEnd: 'rgba(255, 160, 122, .9)',
-          valueBox: false,
+          valueBox: true,
           valueTextShadow: false,
           colorCircleInner: '#fff',
           colorNeedleCircleOuter: '#ccc',
@@ -60,12 +67,24 @@
           colorNeedleShadowDown: '#222',
           borderShadowWidth: 0,
           animationTarget: 'plate',
-          animationDuration: 50,
+          animationDuration: 500,
           animateOnInit: true,
           units: 'ᵍ',
           title: 'Heading',
           fontTitleSize: 19,
           colorTitle: '#f5f5f5'
+        }
+      }
+    },
+    watch: {
+      value (n, o) {
+        var self = this
+
+        if (self.timer === null) {
+          self.timer = setTimeout(() => {
+            self.heading = n
+            self.timer = null
+          }, 500)
         }
       }
     }

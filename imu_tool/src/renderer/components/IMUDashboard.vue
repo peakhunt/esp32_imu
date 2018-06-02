@@ -27,6 +27,10 @@
         // console.log('compass orient: ' + o.data.yaw)
         this.value = o.data.yaw
 
+        if (this.value < 0 || this.value > 360) {
+          console.log('******* holy shit...... ' + this.value)
+        }
+
         this.orientation = {
           roll: o.data.roll,
           pitch: o.data.pitch,
