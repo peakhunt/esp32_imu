@@ -1,6 +1,6 @@
 <template>
-  <v-container grid-list-md text-xs-center>
-    <v-layout row wrap align-center justify-center>
+  <v-container fluid grid-list-md text-xs-center style="min-width: 1000px;">
+    <v-layout row align-center justify-center>
       <v-flex xs4>
         <div :width="400" :height="550">
           <compass :value="value" :width="350" :height="350"> </compass>

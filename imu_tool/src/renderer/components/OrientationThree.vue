@@ -59,6 +59,11 @@
       }
     },
     mounted () {
+      var w = this.$refs.threeCanvas.offsetWidth
+      var h = this.$refs.threeCanvas.offsetHeight
+
+      console.log('w: ' + w + ',' + 'h: ' + h)
+
       this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000)
       this.camera.position.set(0, 0, 10)
 
