@@ -19,23 +19,27 @@
         requestAnimationFrame(this.do_render)
       },
       set_heading_offset () {
-        this.heading_offset = -this.o.yaw
+        this.heading_offset = -this.r.yaw
 
         console.log('setting heading offset to:' + this.heading_offset)
 
-        this.set_orientation(this.o)
+        this.set_orientation(this.r)
       },
       set_orientation (o) {
         // FIXME. change the code to use quaternion to avoid gimbal lock
         // from euler angles.
 
-        this.o.roll = o.roll
-        this.o.pitch = o.pitch
-        this.o.yaw = o.yaw + this.heading_offset
+        this.r.roll = o.roll
+        this.r.pitch = o.pitch
+        this.r.yaw = o.yaw
 
-        var z = this.o.roll * Math.PI / 180
-        var x = this.o.pitch * Math.PI / 180
-        var y = this.o.yaw * Math.PI / 180
+        var roll = o.roll
+        var pitch = o.pitch
+        var yaw = o.yaw + this.heading_offset
+
+        var z = roll * Math.PI / 180
+        var x = pitch * Math.PI / 180
+        var y = yaw * Math.PI / 180
 
         var rot = new THREE.Euler(-x, -y, z, 'XYZ')
 
@@ -128,7 +132,7 @@
         arrowY: null,
         arrowZ: null,
         heading_offset: 0,
-        o: {
+        r: {
           roll: 0,
           pitch: 0,
           yaw: 0
