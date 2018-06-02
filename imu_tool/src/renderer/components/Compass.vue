@@ -60,7 +60,7 @@
           colorNeedleShadowDown: '#222',
           borderShadowWidth: 0,
           animationTarget: 'plate',
-          animationDuration: 500,
+          animationDuration: 50,
           animateOnInit: true,
           units: 'ᵍ',
           title: 'Heading',
