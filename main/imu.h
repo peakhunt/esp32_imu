@@ -58,6 +58,7 @@ typedef struct
   float     mag[3];               // in uT
   float     temp;                 // in celcius
   float     orientation[3];       // AHRS output
+  float     quaternion[4];
 } imu_data_t;
 
 typedef struct
