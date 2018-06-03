@@ -26,6 +26,11 @@ export default new Router({
       component: require('@/components/IMUDashboard').default
     },
     {
+      path: '/imu-calibration',
+      name: 'imu-calibration',
+      component: require('@/components/IMUCalibration').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

@@ -213,7 +213,8 @@
         { icon: 'apps', title: 'Welcome', to: '/' },
         { icon: 'bubble_chart', title: 'Inspire', to: '/inspire' },
         { icon: 'bubble_chart', title: 'IMU Graph', to: '/imu-graph' },
-        { icon: 'bubble_chart', title: 'IMU Dashboard', to: '/imu-dashboard' }
+        { icon: 'bubble_chart', title: 'IMU Dashboard', to: '/imu-dashboard' },
+        { icon: 'bubble_chart', title: 'IMU Calibration', to: '/imu-calibration' }
       ],
       miniVariant: false,
       right: true,
