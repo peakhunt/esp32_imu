@@ -124,6 +124,10 @@ It can be quite annoying.
   Got my order from China and here we go
   ![ESP32 JTAG Connect](captures/jtag_capture.jpg "jtag connect")
 
+  And here we go
+  ![ESP32 Openocd](captures/esp32_openocd.png "esp32 openocd")
+  ![ESP32 GDB](captures/esp32_gdb.png "esp32 gdb")
+
 
 ## esptool.py
 ### to read parition table
