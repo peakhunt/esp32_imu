@@ -233,7 +233,7 @@ imu_apply_neu_align(imu_t* imu)
   //   Z(U)
 
   //
-  // madgwick/mahony filter expets NEU
+  // madgwick/mahony filter expects NEU
   //
   //    
   //     x
@@ -268,9 +268,9 @@ imu_update_normal(imu_t* imu)
 
   //
   // remember
-  // a) accel/mag is uniless. you can push in values in any unit
+  // a) accel/mag is unitless. you can push in values in any unit
   // b) gyro must be in degree per second
-  // c) madgwick expects data in NED coordinate.
+  // c) madgwick expects data in NED(or NEU) coordinate.
   //    If your roll/pitch/raw values are strange, suspect this.
   //
 #if USE_MADGWICK == 1
