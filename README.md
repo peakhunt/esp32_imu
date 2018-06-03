@@ -89,14 +89,32 @@ It can be quite annoying.
 
 2. FTDI Connection as shown below
 
-  | FT2232HL     |  ESP32     | Purpose    |
-  | ------------ | ---------- | ---------- |
-  |ADBUS0        | 13         | TCK        |
-  |ADBUS1        | 12         | TDI        |
-  |ADBUS2        | 15         | TDO        |
-  |ADBUS3        | 14         | TMS        |
-  |GND           | GND        | GND        |
-  |VIO           | 3V3        | 3V3        |
+  | FT2232HL     |  ESP32     | Purpose    | SDIO Pin |
+  | ------------ | ---------- | ---------- | -------- |
+  |ADBUS0        | 13         | TCK        | DAT3(2)  |
+  |ADBUS1        | 12         | TDI        | DAT2(1)  |
+  |ADBUS2        | 15         | TDO        | CMD(3)   |
+  |ADBUS3        | 14         | TMS        | CLK(5)   |
+  |GND           | GND        | GND        | VSS2(6)  |
+  |VIO           | 3V3        | 3V3        | NC       |
+
+  adapter pin mapping
+  1 Left, 13 Right
+  1 --> 1 (3V3 PU)
+  2 --> 3
+  3 --> 5
+  4 --> 7  (VDD)
+  5 --> 9
+  6 --> 2, 4, 6, 8, 10, 12 (GND)
+  7 --> 11
+  8 --> 13 (3V3 PU)
+
+  to solder :
+  TCK -> 3
+  TDI -> 1
+  TDO -> 5
+  TMS -> 9
+  GND -> 12
 
   Problem is pin 12/13/14/15 are used for SDIO, which means
   * you can't use JTAG interface while using Micro-SD slot
@@ -106,7 +124,27 @@ It can be quite annoying.
   ![SDIO adapter](captures/sdio_adapter.jpg "sdio adapter")
   Check it out at [Aliexpress](https://www.aliexpress.com/item/kebidu-Hot-sale-25CM-48CM-62CM-TF-to-micro-SD-card-Flex-Extension-cable-Extender-Adapter/32832944156.html?spm=2114.10010108.1000013.1.27bc4b3b74DRpO&scm=1007.13339.90158.0&scm_id=1007.13339.90158.0&scm-url=1007.13339.90158.0&pvid=2645295a-4392-4172-896b-e88ce2aafd8f&_t=pvid:2645295a-4392-4172-896b-e88ce2aafd8f,scm-url:1007.13339.90158.0)
 
-  I will defer this debugging setup till the adapter arrives!
+  adapter pin mapping
+  1 Left, 13 Right
+  1 --> 1 (3V3 PU)
+  2 --> 3
+  3 --> 5
+  4 --> 7  (VDD)
+  5 --> 9
+  6 --> 2, 4, 6, 8, 10, 12 (GND)
+  7 --> 11
+  8 --> 13 (3V3 PU)
+
+  to solder :
+  TCK -> 3
+  TDI -> 1
+  TDO -> 5
+  TMS -> 9
+  GND -> 12
+
+  Got my order from China and here we go
+  ![ESP32 JTAG Connect](captures/jtag_capture.jpg "jtag connect")
+
 
 ## esptool.py
 ### to read parition table
