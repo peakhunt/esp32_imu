@@ -114,7 +114,7 @@ It can be quite annoying.
   | 1         | 1             | TDI                   |
   | 2         | 3             | TCK                   |
   | 3         | 5             | TDO                   |
-  | 4         | 7             | VDD (Do Not Donnect)  |
+  | 4         | 7             | VDD (Do Not Connect)  |
   | 5         | 9             | TMS                   |
   | 6         | 2,4,6,8,10,12 | GND                   |
   | 7         | 11            | NC                    |
