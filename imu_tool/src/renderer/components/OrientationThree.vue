@@ -2,6 +2,10 @@
   <div :width="width" :height="height" ref="threeCanvas" class="absolute_container">
     <v-btn fixed @click="set_heading_offset()" style="position: absolute; top: 20px; left: 20px;" color="primary">
     Reset Heading
+
+    <div style="position: absolute; top: 40px; left: 20px; z-index: 100; display: block;" color="primary">Roll : {{roll_fixed}}</div>
+    <div style="position: absolute; top: 60px; left: 20px; z-index: 100; display: block;" color="primary">Pitch : {{pitch_fixed}}</div>
+    <div style="position: absolute; top: 80px; left: 20px; z-index: 100; display: block;" color="primary">Yaw : {{yaw_fixed}}</div>
     </v-btn>
   </div>
 </template>
@@ -13,6 +17,17 @@
   export default {
     name: 'OrientationThree',
     props: ['width', 'height', 'orientation'],
+    computed: {
+      roll_fixed () {
+        return this.r.roll.toFixed(2)
+      },
+      pitch_fixed () {
+        return this.r.pitch.toFixed(2)
+      },
+      yaw_fixed () {
+        return this.r.yaw.toFixed(2)
+      }
+    },
     methods: {
       do_render () {
         this.renderer.render(this.scene, this.camera)
