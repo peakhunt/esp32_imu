@@ -23,8 +23,7 @@
       </v-tab-item>
 
       <v-tab-item :key="2">
-        <v-card flat>
-          <v-card-text>Magnetometer Calibration</v-card-text>
+        <mag-calibration></mag-calibration>
         </v-card>
       </v-tab-item>
     </v-tabs>
@@ -32,7 +31,13 @@
 </template>
 
 <script>
+  import MagCalibration from '@/components/MAGCalibration'
+
   export default {
+    name: 'IMUCalibration',
+    components: {
+      MagCalibration
+    },
     data () {
       return {
         activeTab: 0
