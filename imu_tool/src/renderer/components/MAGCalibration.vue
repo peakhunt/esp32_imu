@@ -3,12 +3,12 @@
     <v-container fluid grid-list-md text-xs-center style="min-width: 900px;">
       <v-layout row align-center justify-center>
         <v-flex xs6>
-          <p>Uncalibrated</p>
+          <p>Raw/Unaligned</p>
           <sphere-fitting-view :width="400" :height="400" ref="uncalibated"></sphere-fitting-view>
         </v-flex>
         
         <v-flex xs6>
-          <p>Calibrated</p>
+          <p>Calibration Applied/Sensor Aligned</p>
           <sphere-fitting-view :width="400" :height="400" ref="calibrated"></sphere-fitting-view>
         </v-flex>
       </v-layout>
