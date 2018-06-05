@@ -11,6 +11,7 @@ One picture is worth a thousand words!
 
 ![IMU tool](captures/imu_tool.png "IMU tool")
 ![IMU tool dashboard](captures/imu_tool_dashboard.png "IMU tool dashboard")
+![MAG Calibration](captures/mag_calibration.png "Magnetometer Calibration")
 
 
 
