@@ -256,12 +256,16 @@ imu_task_init(void)
 }
 
 void
-imu_task_get_raw_and_data(imu_mode_t* mode, imu_sensor_data_t* raw, imu_data_t* data)
+imu_task_get_raw_and_data(imu_mode_t* mode,
+    imu_sensor_data_t* raw,
+    imu_sensor_data_t* calibrated,
+    imu_data_t* data)
 {
   xSemaphoreTake(_mutex, portMAX_DELAY);
 
   *mode = _imu.mode;
-  memcpy(raw, &_imu.adjusted, sizeof(imu_sensor_data_t));
+  memcpy(raw, &_imu.raw, sizeof(imu_sensor_data_t));
+  memcpy(calibrated, &_imu.adjusted, sizeof(imu_sensor_data_t));
   memcpy(data, &_imu.data, sizeof(imu_data_t));
 
   xSemaphoreGive(_mutex);

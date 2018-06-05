@@ -68,12 +68,12 @@ print_page1(void)
 static void
 print_page2(void)
 {
-  imu_sensor_data_t raw;
+  imu_sensor_data_t raw, calibrated;
   imu_data_t        data;
   char                      buffer[32];
   imu_mode_t        mode;
 
-  imu_task_get_raw_and_data(&mode, &raw, &data);
+  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
 
   if(mode == imu_mode_normal)
   {
