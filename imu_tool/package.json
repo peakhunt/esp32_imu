@@ -71,7 +71,8 @@
     "vue2-canvas-gauges": "0.0.0",
     "vuetify": "1.0.0",
     "vuewheel": "^2.1.6",
-    "vuex": "^2.3.1"
+    "vuex": "^2.3.1",
+    "webpack-material-design-icons": "^0.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

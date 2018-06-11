@@ -10,6 +10,8 @@ import store from './store'
 import VDragged from 'v-dragged'
 import vuewheel from 'vuewheel'
 
+import 'material-design-icons/iconfont/material-icons.css'
+
 Vue.use(Vuetify)
 Vue.use(VDragged)
 Vue.use(vuewheel)
