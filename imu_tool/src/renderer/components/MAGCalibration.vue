@@ -18,6 +18,7 @@
 
 <script>
   import SphereFittingView from '@/components/SphereFittingView'
+  import {ImuComm} from '@/imu_comm'
 
   export default {
     name: 'MagCalibrationVue',
@@ -45,10 +46,10 @@
       }
     },
     created () {
-      this.$root.$children[0].$on('imuOrientation', this.onImuOrientation)
+      ImuComm.$on('imuOrientation', this.onImuOrientation)
     },
     beforeDestroy () {
-      this.$root.$children[0].$off('imuOrientation', this.onImuOrientation)
+      ImuComm.$off('imuOrientation', this.onImuOrientation)
     }
   }
 </script>

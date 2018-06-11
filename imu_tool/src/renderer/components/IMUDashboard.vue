@@ -18,6 +18,7 @@
 <script>
   import Compass from '@/components/Compass'
   import OrientationThree from '@/components/OrientationThree'
+  import {ImuComm} from '@/imu_comm'
 
   export default {
     name: 'IMUDashboard',
@@ -39,10 +40,10 @@
       }
     },
     created () {
-      this.$root.$children[0].$on('imuOrientation', this.onImuOrientation)
+      ImuComm.$on('imuOrientation', this.onImuOrientation)
     },
     beforeDestroy () {
-      this.$root.$children[0].$off('imuOrientation', this.onImuOrientation)
+      ImuComm.$off('imuOrientation', this.onImuOrientation)
     },
     data () {
       return {

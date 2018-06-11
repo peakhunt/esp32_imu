@@ -20,6 +20,7 @@
 <script>
   import LineChart from '@/components/LineChart'
   import dateFormat from 'dateformat'
+  import {ImuComm} from '@/imu_comm'
 
   export default {
     name: 'IMUGraph',
@@ -192,8 +193,8 @@
 
         self.count++
 
-        if (self.count > o.connectInfo.bufferSize) {
-          // console.log(o.connectInfo.bufferSize)
+        if (self.count > ImuComm.bufferSize) {
+          // console.log(ImuComm.bufferSize)
           self.$refs['lineGraph'].refresh()
           self.count = 0
         }
@@ -218,16 +219,16 @@
       }
     },
     created () {
-      this.$root.$children[0].$on('imuOrientation', this.onImuOrientation)
-      this.$root.$children[0].$on('onConnected', this.onConnected)
-      this.$root.$children[0].$on('onDisconnected', this.onDisconnected)
+      ImuComm.$on('imuOrientation', this.onImuOrientation)
+      ImuComm.$on('onConnected', this.onConnected)
+      ImuComm.$on('onDisconnected', this.onDisconnected)
 
-      this.playingRealtime = !this.$root.$children[0].isStopped
+      this.playingRealtime = !ImuComm.isStopped
     },
     beforeDestroy () {
-      this.$root.$children[0].$off('imuOrientation', this.onImuOrientation)
-      this.$root.$children[0].$off('onConnected', this.onConnected)
-      this.$root.$children[0].$off('onDisconnected', this.onDisconnected)
+      ImuComm.$off('imuOrientation', this.onImuOrientation)
+      ImuComm.$off('onConnected', this.onConnected)
+      ImuComm.$off('onDisconnected', this.onDisconnected)
     },
     data () {
       var configOptions = {

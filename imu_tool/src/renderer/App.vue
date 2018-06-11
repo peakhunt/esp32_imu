@@ -49,40 +49,30 @@
         <v-spacer></v-spacer>
 
         <v-badge left>
-          <span slot="badge">{{numRequest}}</span>
+          <span slot="badge">{{ImuComm.numRequest}}</span>
           <span>Requests</span>
         </v-badge>
         &nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;
 
         <v-badge left>
-          <span slot="badge">{{numSuccess}}</span>
+          <span slot="badge">{{ImuComm.numSuccess}}</span>
           <span>Success</span>
         </v-badge>
         &nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;
 
         <v-badge left>
-          <span slot="badge">{{numFail}}</span>
+          <span slot="badge">{{ImuComm.numFail}}</span>
           <span>Fails</span>
         </v-badge>
 
-        <v-btn v-if="isStopped === true" icon @click="showConnectDialog = true">
+        <v-btn v-if="ImuComm.isStopped === true" icon @click="showConnectDialog = true">
           <v-icon>play_arrow</v-icon>
         </v-btn>
-        <v-btn v-if="isStopped === false" icon @click="onStopPressed">
+        <v-btn v-if="ImuComm.isStopped === false" icon @click="onStopPressed">
           <v-icon>stop</v-icon>
         </v-btn>
-
-        <!-- only for simulation
-        <v-btn v-if="isStopped === true" icon @click="onSimulStart">
-          <v-icon>play_arrow</v-icon>
-        </v-btn>
-        <v-btn v-if="isStopped === false" icon @click="onSimulStop">
-          <v-icon>stop</v-icon>
-        </v-btn>
-        -->
-
       </v-toolbar>
 
       <v-content>
@@ -105,104 +95,21 @@
 
 <script>
   import ConnectDialog from '@/components/ConnectDialog'
+  import {ImuComm} from '@/imu_comm'
 
   export default {
     name: 'imu_tool',
     components: { ConnectDialog },
     methods: {
-      getRandom (min, max) {
-        return Math.random() * (max - min) + min
-      },
-      onSimulStart () {
-        this.isStopped = false
-
-        this.numRequest = 0
-        this.numSuccess = 0
-        this.numFail = 0
-
-        this.$emit('onConnected')
-
-        this.simulTimer = setInterval(() => {
-          var obj = {
-            data: {
-              roll: this.getRandom(-180, 180),
-              pitch: this.getRandom(-180, 180),
-              yaw: this.getRandom(0, 360),
-              ax: this.getRandom(-2, 2),
-              ay: this.getRandom(-2, 2),
-              az: this.getRandom(-2, 2),
-              gx: this.getRandom(-2, 2),
-              gy: this.getRandom(-2, 2),
-              gz: this.getRandom(-2, 2),
-              mx: this.getRandom(-2, 2),
-              my: this.getRandom(-2, 2),
-              mz: this.getRandom(-2, 2)
-            },
-            connectInfo: {
-              bufferSize: 5
-            }
-          }
-          this.$emit('imuOrientation', obj)
-        }, 10)
-      },
-      onSimulStop () {
-        this.$emit('onDisconnected')
-        this.isStopped = true
-        if (this.simulTimer != null) {
-          clearInterval(this.simulTimer)
-          this.simulTimer = null
-        }
-      },
-      getIMUData (server) {
-        var url = 'http://' + server.ipAddress + ':' + server.port + '/imu/orientation'
-
-        // console.log('requesting ' + url)
-        this.numRequest++
-
-        this.$http.get(url)
-          .then((response) => {
-            // console.log('got data')
-
-            this.numSuccess++
-
-            if (this.isStopped === true) {
-              return
-            }
-            this.$emit('imuOrientation', Object.assign(response.data, { connectInfo: server }))
-            if (server.wait !== 0) {
-              this.timer = setTimeout(() => {
-                this.getIMUData(server)
-              }, server.wait)
-            } else {
-              this.getIMUData(server)
-            }
-          }, (err) => {
-            this.numFail++
-            console.log('failed to retrieve:' + err)
-            this.isStopped = true
-          })
-      },
       onConnectPressed (info) {
         this.showConnectDialog = false
-        this.isStopped = false
-
-        this.numRequest = 0
-        this.numSuccess = 0
-        this.numFail = 0
-
-        this.$emit('onConnected')
-        this.getIMUData(info)
+        ImuComm.start(info)
       },
       onDismissPressed () {
         this.showConnectDialog = false
       },
       onStopPressed () {
-        this.$emit('onDisconnected')
-        this.isStopped = true
-        if (this.timer != null) {
-          clearTimeout(this.timer)
-          this.timer = null
-        }
+        ImuComm.stop()
       }
     },
     data: () => ({
@@ -221,12 +128,7 @@
       rightDrawer: false,
       title: 'IMU Tool',
       showConnectDialog: false,
-      isStopped: true,
-      timer: null,
-      simulTimer: null,
-      numRequest: 0,
-      numSuccess: 0,
-      numFail: 0
+      ImuComm: ImuComm
     })
   }
 </script>
