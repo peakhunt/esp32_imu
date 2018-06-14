@@ -22,6 +22,7 @@ const static char* TAG = "webserver";
 const static struct mg_str _imu_raw = MG_MK_STR("/imu/raw");
 const static struct mg_str _imu_real = MG_MK_STR("/imu/real");
 const static struct mg_str _imu_orientation = MG_MK_STR("/imu/orientation");
+const static struct mg_str _imu_mag_data = MG_MK_STR("/imu/mag_data");
 const static struct mg_str _imu_debug = MG_MK_STR("/imu/debug");
 
 static inline void
@@ -128,27 +129,32 @@ webapi_imu_orientation(struct mg_connection* nc, struct http_message* hm)
   mg_printf_http_chunk(nc, "\"mx\": %.2f,", data.mag[0]);
   mg_printf_http_chunk(nc, "\"my\": %.2f,", data.mag[1]);
   mg_printf_http_chunk(nc, "\"mz\": %.2f", data.mag[2]);
-  mg_printf_http_chunk(nc, "},");
+  mg_printf_http_chunk(nc, "}}");
 
-  mg_printf_http_chunk(nc, "\"raw\": {");
-  mg_printf_http_chunk(nc, "\"ax\": %d,", raw.accel[0]);
-  mg_printf_http_chunk(nc, "\"ay\": %d,", raw.accel[1]);
-  mg_printf_http_chunk(nc, "\"az\": %d,", raw.accel[2]);
-  mg_printf_http_chunk(nc, "\"gx\": %d,", raw.gyro[0]);
-  mg_printf_http_chunk(nc, "\"gy\": %d,", raw.gyro[1]);
-  mg_printf_http_chunk(nc, "\"gz\": %d,", raw.gyro[2]);
+  mg_send_http_chunk(nc, "", 0);
+}
+
+static inline void
+webapi_imu_mag_data(struct mg_connection* nc, struct http_message* hm)
+{
+  imu_sensor_data_t raw, calibrated;
+  imu_data_t        data;
+  imu_mode_t        mode;
+
+  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
+
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Transfer-Encoding: chunked\r\n\r\n");
+
+  mg_printf_http_chunk(nc, "{\"raw\": {");
   mg_printf_http_chunk(nc, "\"mx\": %d,", raw.mag[0]);
   mg_printf_http_chunk(nc, "\"my\": %d,", raw.mag[1]);
   mg_printf_http_chunk(nc, "\"mz\": %d", raw.mag[2]);
   mg_printf_http_chunk(nc, "},");
 
   mg_printf_http_chunk(nc, "\"cal\": {");
-  mg_printf_http_chunk(nc, "\"ax\": %d,", calibrated.accel[0]);
-  mg_printf_http_chunk(nc, "\"ay\": %d,", calibrated.accel[1]);
-  mg_printf_http_chunk(nc, "\"az\": %d,", calibrated.accel[2]);
-  mg_printf_http_chunk(nc, "\"gx\": %d,", calibrated.gyro[0]);
-  mg_printf_http_chunk(nc, "\"gy\": %d,", calibrated.gyro[1]);
-  mg_printf_http_chunk(nc, "\"gz\": %d,", calibrated.gyro[2]);
   mg_printf_http_chunk(nc, "\"mx\": %d,", calibrated.mag[0]);
   mg_printf_http_chunk(nc, "\"my\": %d,", calibrated.mag[1]);
   mg_printf_http_chunk(nc, "\"mz\": %d", calibrated.mag[2]);
@@ -205,6 +211,10 @@ mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
       else if(mg_strcmp(hm->uri, _imu_orientation) == 0)
       {
         webapi_imu_orientation(nc, hm);
+      }
+      else if(mg_strcmp(hm->uri, _imu_mag_data) == 0)
+      {
+        webapi_imu_mag_data(nc, hm);
       }
       else if(mg_strcmp(hm->uri, _imu_debug) == 0)
       {

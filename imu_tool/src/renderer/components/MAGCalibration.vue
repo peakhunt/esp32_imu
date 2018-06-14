@@ -46,10 +46,10 @@
       }
     },
     created () {
-      ImuComm.$on('imuOrientation', this.onImuOrientation)
+      ImuComm.$on('imuMagnetometer', this.onImuOrientation)
     },
     beforeDestroy () {
-      ImuComm.$off('imuOrientation', this.onImuOrientation)
+      ImuComm.$off('imuMagnetometer', this.onImuOrientation)
     }
   }
 </script>

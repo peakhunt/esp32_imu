@@ -32,6 +32,7 @@
 
 <script>
   import MagCalibration from '@/components/MAGCalibration'
+  import {ImuComm} from '@/imu_comm'
 
   export default {
     name: 'IMUCalibration',
@@ -41,6 +42,24 @@
     data () {
       return {
         activeTab: 0
+      }
+    },
+    watch: {
+      activeTab (ņ, o) {
+        switch (this.activeTab) {
+          case '0':
+            console.log('putting gyro cal mode')
+            break
+
+          case '1':
+            console.log('putting acceleometer cal mode')
+            break
+
+          case '2':
+            console.log('putting magnetometer cal mode')
+            ImuComm.putMagnetometerMode()
+            break
+        }
       }
     }
   }

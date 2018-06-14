@@ -219,6 +219,8 @@
       }
     },
     created () {
+      ImuComm.putOrientationMode()
+
       ImuComm.$on('imuOrientation', this.onImuOrientation)
       ImuComm.$on('onConnected', this.onConnected)
       ImuComm.$on('onDisconnected', this.onDisconnected)

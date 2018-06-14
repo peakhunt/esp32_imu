@@ -40,6 +40,8 @@
       }
     },
     created () {
+      ImuComm.putOrientationMode()
+
       ImuComm.$on('imuOrientation', this.onImuOrientation)
     },
     beforeDestroy () {

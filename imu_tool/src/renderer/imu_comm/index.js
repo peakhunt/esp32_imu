@@ -1,8 +1,11 @@
 import Vue from 'vue'
 
+const ImuCommModeOrientation = 0
+const ImuCommModeMagnetometer = 1
+
 export const ImuComm = new Vue({
   methods: {
-    getIMUData () {
+    getOrientationData () {
       var self = this
       var url = 'http://' + self.ipAddress + ':' + self.port + '/imu/orientation'
 
@@ -28,6 +31,43 @@ export const ImuComm = new Vue({
           self.isStopped = true
         })
     },
+    getMagData () {
+      var self = this
+      var url = 'http://' + self.ipAddress + ':' + self.port + '/imu/mag_data'
+
+      self.numRequest++
+      self.$http.get(url)
+        .then((response) => {
+          // console.log('got data')
+          self.numSuccess++
+          if (self.isStopped === true) {
+            return
+          }
+          self.$emit('imuMagnetometer', response.data)
+          if (self.wait !== 0) {
+            self.timer = setTimeout(() => {
+              self.getIMUData()
+            }, self.wait)
+          } else {
+            self.getIMUData()
+          }
+        }, (err) => {
+          self.numFail++
+          console.log('failed to retrieve:' + err)
+          self.isStopped = true
+        })
+    },
+    getIMUData () {
+      switch (this.mode) {
+        case ImuCommModeOrientation:
+          this.getOrientationData()
+          break
+
+        case ImuCommModeMagnetometer:
+          this.getMagData()
+          break
+      }
+    },
     start (serverInfo) {
       this.ipAddress = serverInfo.ipAddress
       this.port = serverInfo.port
@@ -49,6 +89,12 @@ export const ImuComm = new Vue({
         clearTimeout(this.timer)
         this.timer = null
       }
+    },
+    putOrientationMode () {
+      this.mode = ImuCommModeOrientation
+    },
+    putMagnetometerMode () {
+      this.mode = ImuCommModeMagnetometer
     }
   },
   data: {
@@ -60,6 +106,7 @@ export const ImuComm = new Vue({
     bufferSize: 5,
     numRequest: 0,
     numSuccess: 0,
-    numFail: 0
+    numFail: 0,
+    mode: ImuCommModeOrientation
   }
 })
