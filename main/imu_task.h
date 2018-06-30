@@ -23,5 +23,9 @@ extern uint32_t imu_task_get_loop_cnt(void);
 
 extern void imu_task_get_cal_state(imu_sensor_calib_data_t* cal);
 
+extern void imu_task_get_mag_calibration(imu_mode_t* mode,
+    int16_t raw[3],
+    int16_t calibrated[3],
+    int16_t mag_bias[3]);
 
 #endif /* !__IMU_TASK_DEF_H__ */

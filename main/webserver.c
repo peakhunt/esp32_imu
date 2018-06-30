@@ -137,11 +137,12 @@ webapi_imu_orientation(struct mg_connection* nc, struct http_message* hm)
 static inline void
 webapi_imu_mag_data(struct mg_connection* nc, struct http_message* hm)
 {
-  imu_sensor_data_t raw, calibrated;
-  imu_data_t        data;
   imu_mode_t        mode;
+  int16_t           raw[3];
+  int16_t           calibrated[3];
+  int16_t           mag_bias[3];
 
-  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
+  imu_task_get_mag_calibration(&mode, raw, calibrated, mag_bias);
 
   mg_printf(nc, "%s",
       "HTTP/1.1 200 OK\r\n"
@@ -149,16 +150,26 @@ webapi_imu_mag_data(struct mg_connection* nc, struct http_message* hm)
       "Transfer-Encoding: chunked\r\n\r\n");
 
   mg_printf_http_chunk(nc, "{\"raw\": {");
-  mg_printf_http_chunk(nc, "\"mx\": %d,", raw.mag[0]);
-  mg_printf_http_chunk(nc, "\"my\": %d,", raw.mag[1]);
-  mg_printf_http_chunk(nc, "\"mz\": %d", raw.mag[2]);
+  mg_printf_http_chunk(nc, "\"mx\": %d,", raw[0]);
+  mg_printf_http_chunk(nc, "\"my\": %d,", raw[1]);
+  mg_printf_http_chunk(nc, "\"mz\": %d", raw[2]);
   mg_printf_http_chunk(nc, "},");
 
   mg_printf_http_chunk(nc, "\"cal\": {");
-  mg_printf_http_chunk(nc, "\"mx\": %d,", calibrated.mag[0]);
-  mg_printf_http_chunk(nc, "\"my\": %d,", calibrated.mag[1]);
-  mg_printf_http_chunk(nc, "\"mz\": %d", calibrated.mag[2]);
-  mg_printf_http_chunk(nc, "}}");
+  mg_printf_http_chunk(nc, "\"mx\": %d,", calibrated[0]);
+  mg_printf_http_chunk(nc, "\"my\": %d,", calibrated[1]);
+  mg_printf_http_chunk(nc, "\"mz\": %d", calibrated[2]);
+  mg_printf_http_chunk(nc, "},");
+
+  mg_printf_http_chunk(nc, "\"mag_bias\": {");
+  mg_printf_http_chunk(nc, "\"mx\": %d,", mag_bias[0]);
+  mg_printf_http_chunk(nc, "\"my\": %d,", mag_bias[1]);
+  mg_printf_http_chunk(nc, "\"mz\": %d", mag_bias[2]);
+  mg_printf_http_chunk(nc, "},");
+
+  mg_printf_http_chunk(nc, "\"mode\": %d", mode);
+
+  mg_printf_http_chunk(nc, "}");
 
   mg_send_http_chunk(nc, "", 0);
 }

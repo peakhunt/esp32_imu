@@ -272,6 +272,31 @@ imu_task_get_raw_and_data(imu_mode_t* mode,
 }
 
 void
+imu_task_get_mag_calibration(imu_mode_t* mode,
+    int16_t raw[3],
+    int16_t calibrated[3],
+    int16_t mag_bias[3])
+{
+  xSemaphoreTake(_mutex, portMAX_DELAY);
+
+  *mode   = _imu.mode;
+
+  raw[0]  = _imu.raw.mag[0];
+  raw[1]  = _imu.raw.mag[1];
+  raw[2]  = _imu.raw.mag[2];
+
+  calibrated[0] = _imu.adjusted.mag[0];
+  calibrated[1] = _imu.adjusted.mag[1];
+  calibrated[2] = _imu.adjusted.mag[2];
+
+  mag_bias[0] = _imu.cal.mag_bias[0];
+  mag_bias[1] = _imu.cal.mag_bias[1];
+  mag_bias[2] = _imu.cal.mag_bias[2];
+
+  xSemaphoreGive(_mutex);
+}
+
+void
 imu_task_get_cal_state(imu_sensor_calib_data_t* cal)
 {
   xSemaphoreTake(_mutex, portMAX_DELAY);

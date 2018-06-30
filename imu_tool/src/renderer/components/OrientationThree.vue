@@ -133,6 +133,16 @@
       this.do_render()
     },
     beforeDestroy () {
+      this.camera = null
+      this.renderer = null
+      this.scene = null
+      this.light = null
+      this.cube = null
+      this.controls = null
+      this.axisHelper = null
+      this.arrowX = null
+      this.arrowY = null
+      this.arrowZ = null
     },
     data () {
       return {
