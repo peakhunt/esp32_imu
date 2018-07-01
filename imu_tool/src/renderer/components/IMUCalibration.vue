@@ -23,7 +23,7 @@
       </v-tab-item>
 
       <v-tab-item :key="2">
-        <mag-calibration></mag-calibration>
+        <mag-calibration ref="magCal"></mag-calibration>
         </v-card>
       </v-tab-item>
     </v-tabs>
@@ -58,6 +58,7 @@
           case '2':
             console.log('putting magnetometer cal mode')
             ImuComm.putMagnetometerMode()
+            this.$refs['magCal'].tabSelected()
             break
         }
       }

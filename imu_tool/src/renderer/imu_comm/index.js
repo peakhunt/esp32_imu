@@ -95,6 +95,23 @@ export const ImuComm = new Vue({
     },
     putMagnetometerMode () {
       this.mode = ImuCommModeMagnetometer
+    },
+    startMagCalibration (callback) {
+      var self = this
+      var url = 'http://' + self.ipAddress + ':' + self.port + '/imu/mag_calibrate'
+
+      self.$http.post(url,
+        {
+          dummy: 0
+        },
+        {
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then((response) => {
+          callback(null, response)
+        }, (err) => {
+          callback(err, null)
+        })
     }
   },
   data: {

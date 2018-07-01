@@ -209,7 +209,7 @@ imu_task(void* pvParameters)
       switch(_imu.mode)
       {
       case imu_mode_mag_calibrating:
-        if((now.tv_sec - cal_start_time.tv_sec) >= 30)
+        if((now.tv_sec - cal_start_time.tv_sec) >= 60)
         {
           imu_mag_calibration_finish(&_imu);
           imu_task_save_calibration();

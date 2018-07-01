@@ -25,6 +25,8 @@ const static struct mg_str _imu_orientation = MG_MK_STR("/imu/orientation");
 const static struct mg_str _imu_mag_data = MG_MK_STR("/imu/mag_data");
 const static struct mg_str _imu_debug = MG_MK_STR("/imu/debug");
 
+const static struct mg_str _imu_mag_calibrate = MG_MK_STR("/imu/mag_calibrate");
+
 static inline void
 webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 {
@@ -201,6 +203,17 @@ webapi_imu_debug(struct mg_connection* nc, struct http_message* hm)
   mg_send_http_chunk(nc, "", 0);
 }
 
+static inline void
+webapi_imu_mag_calibrate(struct mg_connection* nc, struct http_message* hm)
+{
+  imu_task_do_mag_calibration();
+
+  mg_printf(nc, "%s",
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/json\r\n"
+      "Content-Length: 0\r\n\r\n");
+}
+
 static void
 mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
 {
@@ -230,6 +243,17 @@ mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
       else if(mg_strcmp(hm->uri, _imu_debug) == 0)
       {
         webapi_imu_debug(nc, hm);
+      }
+      else
+      {
+        webapi_not_found(nc, hm);
+      }
+    }
+    if(mg_vcmp(&hm->method, "POST") == 0)
+    {
+      if(mg_strcmp(hm->uri, _imu_mag_calibrate) == 0)
+      {
+        webapi_imu_mag_calibrate(nc, hm);
       }
       else
       {
