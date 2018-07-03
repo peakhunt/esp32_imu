@@ -67,6 +67,9 @@ ESP32 comes with 520 KiB SRAM. Most boards I know have 4 MB SPI flash.
 | RTC slow    | blah blah blah                                                       |
 
 ## 1.44 LCD
+
+*** Bullshit: Rewriting this part again ***
+
 According to the shcematic, ST7735 TFT is connected to ESP32 using S/W SPI.
 Pretty bad not to use H/W SPI and DMA for LCD interface.
 
