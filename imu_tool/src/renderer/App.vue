@@ -95,7 +95,7 @@
 
 <script>
   import ConnectDialog from '@/components/ConnectDialog'
-  import {ImuComm} from '@/imu_comm'
+  import {ImuComm} from '@/imu_comm_ws'
 
   export default {
     name: 'imu_tool',

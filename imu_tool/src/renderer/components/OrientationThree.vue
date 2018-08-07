@@ -31,7 +31,7 @@
     methods: {
       do_render () {
         this.renderer.render(this.scene, this.camera)
-        requestAnimationFrame(this.do_render)
+        this.reqAnimID = requestAnimationFrame(this.do_render)
       },
       set_heading_offset () {
         this.heading_offset = -this.r.yaw
@@ -133,6 +133,10 @@
       this.do_render()
     },
     beforeDestroy () {
+      if (this.reqAnimID != null) {
+        cancelAnimationFrame(this.reqAnimID)
+        this.reqAnimID = null
+      }
       this.camera = null
       this.renderer = null
       this.scene = null
@@ -148,6 +152,7 @@
       return {
         camera: null,
         renderer: null,
+        reqAnimID: null,
         scene: null,
         light: null,
         cube: null,

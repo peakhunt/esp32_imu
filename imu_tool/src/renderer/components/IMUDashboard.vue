@@ -18,7 +18,7 @@
 <script>
   import Compass from '@/components/Compass'
   import OrientationThree from '@/components/OrientationThree'
-  import {ImuComm} from '@/imu_comm'
+  import {ImuComm} from '@/imu_comm_ws'
 
   export default {
     name: 'IMUDashboard',

@@ -20,7 +20,7 @@
 <script>
   import LineChart from '@/components/LineChart'
   import dateFormat from 'dateformat'
-  import {ImuComm} from '@/imu_comm'
+  import {ImuComm} from '@/imu_comm_ws'
 
   export default {
     name: 'IMUGraph',

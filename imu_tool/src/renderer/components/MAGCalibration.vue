@@ -37,7 +37,7 @@
 <script>
   import SphereFittingView from '@/components/SphereFittingView'
   import MagCalibrationDialog from '@/components/MAGCalibrationDialog'
-  import {ImuComm} from '@/imu_comm'
+  import {ImuComm} from '@/imu_comm_ws'
 
   export default {
     name: 'MagCalibrationVue',

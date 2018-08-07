@@ -15,7 +15,7 @@
     methods: {
       do_render () {
         this.renderer.render(this.scene, this.camera)
-        requestAnimationFrame(this.do_render)
+        this.reqAnimID = requestAnimationFrame(this.do_render)
       },
       push_point (p) {
         if (this.pointCount >= MAX_POINTS) {
@@ -85,11 +85,16 @@
       this.do_render()
     },
     beforeDestroy () {
+      if (this.reqAnimID != null) {
+        cancelAnimationFrame(this.reqAnimID)
+        this.reqAnimID = null
+      }
     },
     data () {
       return {
         camera: null,
         renderer: null,
+        reqAnimID: null,
         scene: null,
         controls: null,
         arrowX: null,
