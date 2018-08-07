@@ -27,6 +27,8 @@ const static struct mg_str _imu_debug = MG_MK_STR("/imu/debug");
 
 const static struct mg_str _imu_mag_calibrate = MG_MK_STR("/imu/mag_calibrate");
 
+static char _str_buf[512];
+
 static inline void
 webapi_not_found(struct mg_connection* nc, struct http_message* hm)
 {
@@ -214,6 +216,192 @@ webapi_imu_mag_calibrate(struct mg_connection* nc, struct http_message* hm)
       "Content-Length: 0\r\n\r\n");
 }
 
+////////////////////////////////////////////////////////////////
+//
+// websocket based api implementation
+//
+////////////////////////////////////////////////////////////////
+static inline void
+webapi_imu_raw_websocket(struct mg_connection* nc)
+{
+  imu_sensor_data_t raw, calibrated;
+  imu_data_t        data;
+  imu_mode_t        mode;
+
+  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
+
+  sprintf(_str_buf, "{\"data\": {"
+                    "accel_raw: [ %d,%d,%d ],"
+                    "gyro_raw: [ %d,%d,%d ],"
+                    "mag_raw: [ %d,%d,%d ]"
+                    "}}",
+                    raw.accel[0],
+                    raw.accel[1],
+                    raw.accel[2],
+                    raw.gyro[0],
+                    raw.gyro[1],
+                    raw.gyro[2],
+                    raw.mag[0],
+                    raw.mag[1],
+                    raw.mag[2]);
+
+  mg_send_websocket_frame(nc, WEBSOCKET_OP_TEXT, _str_buf, strlen(_str_buf));
+}
+
+static inline void
+webapi_imu_real_websocket(struct mg_connection* nc)
+{
+  imu_sensor_data_t raw, calibrated;
+  imu_data_t        data;
+  imu_mode_t        mode;
+
+  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
+
+  sprintf(_str_buf, "{\"data\": {"
+                    "accel: [%.2f, %.2f, %.2f],"
+                    "gyro: [%.2f, %.2f, %.2f],"
+                    "mag: [%.2f, %.2f, %.2f]"
+                    "}}",
+                    data.accel[0],
+                    data.accel[1],
+                    data.accel[2],
+                    data.gyro[0],
+                    data.gyro[1],
+                    data.gyro[2],
+                    data.mag[0],
+                    data.mag[1],
+                    data.mag[2]);
+
+  mg_send_websocket_frame(nc, WEBSOCKET_OP_TEXT, _str_buf, strlen(_str_buf));
+}
+
+static inline void
+webapi_imu_orientation_websocket(struct mg_connection* nc)
+{
+  imu_sensor_data_t raw, calibrated;
+  imu_data_t        data;
+  imu_mode_t        mode;
+
+  imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
+
+  sprintf(_str_buf, "{\"data\": {"
+                    "\"roll\": %.2f, "
+                    "\"pitch\": %.2f, "
+                    "\"yaw\": %.2f,"
+                    "\"ax\": %.2f,"
+                    "\"ay\": %.2f,"
+                    "\"az\": %.2f,"
+                    "\"gx\": %.2f,"
+                    "\"gy\": %.2f,"
+                    "\"gz\": %.2f,"
+                    "\"mx\": %.2f,"
+                    "\"my\": %.2f,"
+                    "\"mz\": %.2f"
+                    "}}",
+                    data.orientation[0],
+                    data.orientation[1],
+                    data.orientation[2],
+                    data.accel[0],
+                    data.accel[1],
+                    data.accel[2],
+                    data.gyro[0],
+                    data.gyro[1],
+                    data.gyro[2],
+                    data.mag[0],
+                    data.mag[1],
+                    data.mag[2]);
+
+  mg_send_websocket_frame(nc, WEBSOCKET_OP_TEXT, _str_buf, strlen(_str_buf));
+}
+
+static inline void
+webapi_imu_mag_data_websocket(struct mg_connection* nc)
+{
+  imu_mode_t        mode;
+  int16_t           raw[3];
+  int16_t           calibrated[3];
+  int16_t           mag_bias[3];
+
+  imu_task_get_mag_calibration(&mode, raw, calibrated, mag_bias);
+
+  sprintf(_str_buf, "{\"raw\": {"
+                    "\"mx\": %d,"
+                    "\"my\": %d,"
+                    "\"mz\": %d"
+                    "},"
+                    "\"cal\": {"
+                    "\"mx\": %d,"
+                    "\"my\": %d,"
+                    "\"mz\": %d"
+                    "},"
+                    "\"mag_bias\": {"
+                    "\"mx\": %d,"
+                    "\"my\": %d,"
+                    "\"mz\": %d"
+                    "},"
+                    "\"mode\": %d"
+                    "}",
+                    raw[0],
+                    raw[1],
+                    raw[2],
+                    calibrated[0],
+                    calibrated[1],
+                    calibrated[2],
+                    mag_bias[0],
+                    mag_bias[1],
+                    mag_bias[2],
+                    mode);
+
+  mg_send_websocket_frame(nc, WEBSOCKET_OP_TEXT, _str_buf, strlen(_str_buf));
+}
+
+static inline void
+webapi_imu_debug_websocket(struct mg_connection* nc)
+{
+  // FIXME
+}
+
+static inline void
+webapi_imu_mag_calibrate_websocket(struct mg_connection* nc)
+{
+  imu_task_do_mag_calibration();
+  webapi_imu_mag_data_websocket(nc);
+}
+
+static inline void
+webapi_imu_handle_web_socket(struct mg_connection* nc, const struct mg_str msg)
+{
+  // mg_send_websocket_frame(c, WEBSOCKET_OP_TEXT, buf, strlen(buf));
+  if(mg_strcmp(msg, _imu_raw) == 0)
+  {
+    webapi_imu_raw_websocket(nc);
+  }
+  else if(mg_strcmp(msg, _imu_real) == 0)
+  {
+    webapi_imu_real_websocket(nc);
+  }
+  else if(mg_strcmp(msg, _imu_orientation) == 0)
+  {
+    webapi_imu_orientation_websocket(nc);
+  }
+  else if(mg_strcmp(msg, _imu_mag_data) == 0)
+  {
+    webapi_imu_mag_data_websocket(nc);
+  }
+  else if(mg_strcmp(msg, _imu_debug) == 0)
+  {
+    webapi_imu_debug_websocket(nc);
+  }
+  else if(mg_strcmp(msg, _imu_mag_calibrate) == 0)
+  {
+    webapi_imu_mag_calibrate_websocket(nc);
+  }
+  else
+  {
+    // FIXME error response
+  }
+}
+
 static void
 mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
 {
@@ -263,6 +451,21 @@ mg_ev_handler(struct mg_connection* nc, int ev, void* ev_data)
     else
     {
       webapi_not_found(nc, hm);
+    }
+    break;
+
+  case MG_EV_WEBSOCKET_HANDSHAKE_DONE:
+    ESP_LOGI(TAG, "websocket handshake done");
+    break;
+
+  case MG_EV_WEBSOCKET_FRAME:
+    {
+      struct websocket_message *wm = (struct websocket_message *) ev_data;
+      struct mg_str msg = {(char *) wm->data, wm->size};
+
+      ESP_LOGI(TAG, "websocket frame");
+
+      webapi_imu_handle_web_socket(nc, msg);
     }
     break;
 
