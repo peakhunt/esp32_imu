@@ -6,99 +6,44 @@
 #include "accel_calibration.h"
 
 /*
-   board orientation (not flipped)
+   is my MPU really MPU9250? Looks like a chinese clone hmmmmm.
 
-          | O|=================| /|\
-          | G|       U(+z)     |  | +x
-          | T|       top       |  |
-          | T|=================|  |
-                                  |
-          <------------- y+  
+   board orientation
 
-              gyro
+   --------
+     TTGO
+   --------
 
-                clock wise rotate around Z : + (need to be inverted)
-                clock wise rotate around Y : + (ok)
-                counter clock wise rotate around X : + (ok)
+   X
+   |
+   |
+ <----      /\
+   |        |
+   |________|_____y
+  z-        |
+  ZCW
 
-              accel 
-                against positive axis: +G
-                
+  magneto
+  X <----------Z+
+               |
+               |
+               |
+               y
 
-  TTGO accel/gyro align 
-
-                    /\
-                    | +y
-                    |
-            T|=================|
-            T|       U(+z)     |
-            G|      bottom     |
-            O|=================|
-               -------------> +x
-
-               flip and rotate
-
-               -------------> +x
-            O|=================|
-            G|       D(+z)     |
-            T|      top        |
-            T|=================|
-                    |
-                    | +y
-                   \|/
-
-          x = -y
-          y = -x
-          z = -z
-
-
-  TTGO mag align
-                    /\
-                    | +x
-                    |
-            T|=================|
-            T|       D(+z)     |
-            G|      bottom     |
-            O|=================|
-               -------------> +y
-
-               flip and rotate
-
-               -------------> +y
-            O|=================|
-            G|       U(+z)     |
-            T|      top        |
-            T|=================|
-                    |
-                    | +x
-                   \|/
-
-         x = -x
-         y = -y
-         z =  z
-
-  Finally NEU setup. Madgwick expects NEU!
-              
-              North
-                /\
-                |   +x
-                |
-                |
-             ----------
-                TTGO
-             ----------
-                top
-                                         +y
-                         -----------------> East
-
-                U(Z+)
-             ----------
-
-
-      so
-            x = y
-            y = x
-            z = z
+  required coordinate system
+  
+   --------
+     TTGO
+   --------
+   x(north, roll)
+   |
+ ----->  
+   |
+   |          |
+   |__________|_______y(east, pitch)
+  z+          |
+  ZCW         \/
+  heading
 
 */
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,16 +51,6 @@
 // utilities
 //
 ////////////////////////////////////////////////////////////////////////////////
-static inline void
-swap_f(float* a, float* b)
-{
-  float tmp;
-
-  tmp = *a;
-  *a = *b;
-  *b = tmp;
-}
-
 static inline void
 alignReading(int16_t* values, imu_board_align_t align)
 {
@@ -172,6 +107,18 @@ alignReading(int16_t* values, imu_board_align_t align)
     values[1] = -x;
     values[2] = -z;
     break;
+
+  case imu_board_align_special:
+    values[0] = -y;
+    values[1] = -x;
+    values[2] =  z;
+    break;
+
+  case imu_board_align_special2:
+    values[0] = x;
+    values[1] = y;
+    values[2] = -z;
+    break;
   }
 }
 
@@ -220,42 +167,6 @@ imu_calc_sensor_value(imu_t* imu)
 }
 
 static void
-imu_apply_neu_align(imu_t* imu)
-{
-  //
-  //   
-  // my board sensor setup
-  //
-  //     y
-  //    |
-  //    |
-  //    |------- x
-  //   Z(U)
-
-  //
-  // madgwick/mahony filter expects NEU
-  //
-  //    
-  //     x
-  //    |
-  //    |
-  //    |------- y
-
-  // FIXME
-  // looks like all gyro directions should be reversed too!!!
-  // why???
-  //
-  swap_f(&imu->data.gyro[0], &imu->data.gyro[1]);
-  imu->data.gyro[2] = -imu->data.gyro[2];
-  imu->data.gyro[0] = -imu->data.gyro[0];
-  imu->data.gyro[1] = -imu->data.gyro[1];
-
-  swap_f(&imu->data.accel[0], &imu->data.accel[1]);
-
-  swap_f(&imu->data.mag[0], &imu->data.mag[1]);
-}
-
-static void
 imu_update_normal(imu_t* imu)
 {
   imu_apply_calibration(imu);
@@ -263,8 +174,6 @@ imu_update_normal(imu_t* imu)
   imu_apply_board_orientation(imu);
 
   imu_calc_sensor_value(imu);
-
-  imu_apply_neu_align(imu);
 
   //
   // remember
@@ -274,18 +183,6 @@ imu_update_normal(imu_t* imu)
   //    If your roll/pitch/raw values are strange, suspect this.
   //
 #if USE_MADGWICK == 1
-  //
-  // NED or NEU or whatever
-  //
-  // I want TTGO mark to be north
-  //
-  // So
-  // north(x) = x
-  // east(y)  = y
-  // D(or U)  = z
-  // read comments in the beginning if you are not sure.
-  // this is still confusing to me
-  //
   madgwick_update(&imu->filter,
       imu->data.gyro[0],  imu->data.gyro[1],   imu->data.gyro[2],
       imu->data.accel[0], imu->data.accel[1],  imu->data.accel[2],
@@ -326,9 +223,9 @@ imu_init(imu_t* imu)
   // update_rate
   // sensor align
   //
-  imu->accel_align  = imu_board_align_cw_270_flip;
-  imu->gyro_align   = imu_board_align_cw_270_flip;
-  imu->mag_align    = imu_board_align_cw_180;
+  imu->accel_align  = imu_board_align_special2;
+  imu->gyro_align   = imu_board_align_cw_180;
+  imu->mag_align    = imu_board_align_special;
 
   imu->update_rate  = 500;
 

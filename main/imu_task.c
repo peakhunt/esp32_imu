@@ -17,7 +17,7 @@
 
 #include "sdkconfig.h"
 
-#define IMU_POLL_INTERVAL               2
+#define IMU_POLL_INTERVAL               1
 
 const static char* TAG = "imu_task";
 

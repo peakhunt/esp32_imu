@@ -339,24 +339,24 @@ cli_command_imu_data(cli_intf_t* intf, int argc, const char** argv)
 
   imu_task_get_raw_and_data(&mode, &raw, &calibrated, &data);
 
-  cli_printf(intf, "Accel Raw X: %d"CLI_EOL, calibrated.accel[0]);
-  cli_printf(intf, "Accel Raw Y: %d"CLI_EOL, calibrated.accel[1]);
-  cli_printf(intf, "Accel Raw Z: %d"CLI_EOL, calibrated.accel[2]);
+  cli_printf(intf, "Accel Raw X: %d"CLI_EOL, raw.accel[0]);
+  cli_printf(intf, "Accel Raw Y: %d"CLI_EOL, raw.accel[1]);
+  cli_printf(intf, "Accel Raw Z: %d"CLI_EOL, raw.accel[2]);
 
   cli_printf(intf, "Accel X    : %-5.2f G"CLI_EOL, data.accel[0]);
   cli_printf(intf, "Accel Y    : %-5.2f G"CLI_EOL, data.accel[1]);
   cli_printf(intf, "Accel Z    : %-5.2f G"CLI_EOL, data.accel[2]);
 
-  cli_printf(intf, "Gyro  Raw X: %d"CLI_EOL, calibrated.gyro[0]);
-  cli_printf(intf, "Gyro  Raw Y: %d"CLI_EOL, calibrated.gyro[1]);
-  cli_printf(intf, "Gyro  Raw Z: %d"CLI_EOL, calibrated.gyro[2]);
+  cli_printf(intf, "Gyro  Raw X: %d"CLI_EOL, raw.gyro[0]);
+  cli_printf(intf, "Gyro  Raw Y: %d"CLI_EOL, raw.gyro[1]);
+  cli_printf(intf, "Gyro  Raw Z: %d"CLI_EOL, raw.gyro[2]);
   cli_printf(intf, "gyro X     : %-5.2f deg/S"CLI_EOL, data.gyro[0]);
   cli_printf(intf, "gyro Y     : %-5.2f deg/S"CLI_EOL, data.gyro[1]);
   cli_printf(intf, "gyro Z     : %-5.2f deg/S"CLI_EOL, data.gyro[2]);
 
-  cli_printf(intf, "Mag   Raw X: %d"CLI_EOL, calibrated.mag[0]);
-  cli_printf(intf, "Mag   Raw Y: %d"CLI_EOL, calibrated.mag[1]);
-  cli_printf(intf, "Mag   Raw Z: %d"CLI_EOL, calibrated.mag[2]);
+  cli_printf(intf, "Mag   Raw X: %d"CLI_EOL, raw.mag[0]);
+  cli_printf(intf, "Mag   Raw Y: %d"CLI_EOL, raw.mag[1]);
+  cli_printf(intf, "Mag   Raw Z: %d"CLI_EOL, raw.mag[2]);
   cli_printf(intf, "Mag  X     : %-5.2f uT"CLI_EOL, data.mag[0]);
   cli_printf(intf, "Mag  Y     : %-5.2f uT"CLI_EOL, data.mag[1]);
   cli_printf(intf, "Mag  Z     : %-5.2f uT"CLI_EOL, data.mag[2]);

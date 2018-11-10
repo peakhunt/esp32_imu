@@ -24,7 +24,9 @@ typedef enum
   imu_board_align_cw_0_flip,
   imu_board_align_cw_90_flip,
   imu_board_align_cw_180_flip,
-  imu_board_align_cw_270_flip
+  imu_board_align_cw_270_flip,
+  imu_board_align_special,
+  imu_board_align_special2
 } imu_board_align_t;
 
 typedef struct
