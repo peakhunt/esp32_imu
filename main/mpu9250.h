@@ -129,5 +129,7 @@ extern void mpu9250_init(mpu9250_t* mpu9250,
     imu_raw_to_real_t* lsb);
 
 extern bool mpu9250_read_all(mpu9250_t* mpu9250, imu_sensor_data_t* data);
+extern bool mpu9250_read_mag(mpu9250_t* mpu9250, imu_sensor_data_t* imu);
+extern bool mpu9250_read_gyro_accel(mpu9250_t* mpu9250, imu_sensor_data_t* imu);
 
 #endif /* !__MPU_9250_DEF_H__ */

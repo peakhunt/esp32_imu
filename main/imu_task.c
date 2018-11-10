@@ -17,7 +17,7 @@
 
 #include "sdkconfig.h"
 
-#define IMU_POLL_INTERVAL               1
+#define IMU_POLL_INTERVAL               2
 
 const static char* TAG = "imu_task";
 
@@ -156,6 +156,7 @@ imu_task(void* pvParameters)
   uint32_t cmd;
   struct timeval    cal_start_time,
                     now;
+  int cnt = 0;
 
   ESP_LOGI(TAG, "starting imu task");
 
@@ -199,7 +200,18 @@ imu_task(void* pvParameters)
 
     xSemaphoreTake(_mutex, portMAX_DELAY);
 
-    mpu9250_read_all(&_mpu9250, &_imu.raw);
+    //mpu9250_read_all(&_mpu9250, &_imu.raw);
+    mpu9250_read_gyro_accel(&_mpu9250, &_imu.raw);
+    if(cnt == 0)
+    {
+      mpu9250_read_mag(&_mpu9250, &_imu.raw);
+    }
+    cnt++;
+    if(cnt >= 25)
+    {
+      cnt = 0;
+    }
+
     imu_update(&_imu);
 
     if(_imu.mode != imu_mode_normal)

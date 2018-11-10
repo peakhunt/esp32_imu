@@ -204,6 +204,34 @@ mpu9250_init(mpu9250_t* mpu9250,
 }
 
 bool
+mpu9250_read_gyro_accel(mpu9250_t* mpu9250, imu_sensor_data_t* imu)
+{
+  uint8_t data[14];
+
+  // read full raw data
+  mpu9250_read_data(MPU9250_ACCEL_XOUT_H, data, 14);
+
+  imu->accel[0] = (int16_t)(data[0] << 8 | data[1]);
+  imu->accel[1] = (int16_t)(data[2] << 8 | data[3]);
+  imu->accel[2] = (int16_t)(data[4] << 8 | data[5]);
+
+  imu->temp     = (data[6] << 8 | data[7]);
+
+  imu->gyro[0]  = (int16_t)(data[8] << 8 | data[9]);
+  imu->gyro[1]  = (int16_t)(data[10] << 8 | data[11]);
+  imu->gyro[2]  = (int16_t)(data[12] << 8 | data[13]);
+
+  return TRUE;
+}
+
+bool
+mpu9250_read_mag(mpu9250_t* mpu9250, imu_sensor_data_t* imu)
+{
+  ak8963_read_all(imu);
+  return TRUE;
+}
+
+bool
 mpu9250_read_all(mpu9250_t* mpu9250, imu_sensor_data_t* imu)
 {
   uint8_t data[14];

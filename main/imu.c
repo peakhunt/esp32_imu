@@ -227,7 +227,7 @@ imu_init(imu_t* imu)
   imu->gyro_align   = imu_board_align_cw_180;
   imu->mag_align    = imu_board_align_special;
 
-  imu->update_rate  = 1000;
+  imu->update_rate  = 500;
 
 #if USE_MADGWICK == 1
   madgwick_init(&imu->filter, imu->update_rate);
